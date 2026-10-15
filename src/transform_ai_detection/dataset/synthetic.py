@@ -14,6 +14,8 @@ from transform_ai_detection.dataset.validator import DatasetValidator
 class SyntheticDatasetAdapter(BaseDatasetAdapter):
     """Generates deterministic synthetic image manipulation samples offline."""
 
+    can_instant_sample_ids: bool = True
+
     def __init__(
         self,
         num_samples: int = 20,

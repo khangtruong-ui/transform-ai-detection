@@ -56,6 +56,8 @@ class DatasetSample:
 class BaseDatasetAdapter(abc.ABC):
     """Abstract interface for dataset adapters."""
 
+    can_instant_sample_ids: bool = False
+
     @abc.abstractmethod
     def __len__(self) -> int:
         """Total number of available samples."""
@@ -93,4 +95,5 @@ class BaseDatasetAdapter(abc.ABC):
             return all_indices
 
         rng = random.Random(seed)
-        return rng.sample(all_indices, count)
+        sampled = rng.sample(all_indices, count)
+        return sorted(sampled)

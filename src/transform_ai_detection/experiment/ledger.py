@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import collections
 import csv
 import os
 from typing import Any, Dict, List, Optional, Set, Tuple
@@ -25,6 +26,8 @@ class ExperimentLedger:
         self._completed_evals: Set[Tuple[str, str, str, str]] = set()
         self._diagnosed_samples: Set[Tuple[str, str, str]] = set()
         self._completed_models: Set[str] = set()
+        self._model_eval_counts: Dict[str, int] = collections.defaultdict(int)
+        self._model_sample_transforms: Dict[Tuple[str, str], Set[Tuple[str, str]]] = collections.defaultdict(set)
         self._baseline_metrics: Dict[Tuple[str, str], Dict[str, Any]] = {}
 
         self._metrics_fields: Optional[List[str]] = None
@@ -48,6 +51,8 @@ class ExperimentLedger:
                         key = (sid, mod, t_name, t_sev)
                         self._completed_evals.add(key)
                         self._completed_models.add(mod)
+                        self._model_eval_counts[mod] += 1
+                        self._model_sample_transforms[(mod, sid)].add((t_name, t_sev))
 
                         # Cache baseline metrics for delta computation and skipping
                         if t_name == "identity" and t_sev == "original":
@@ -82,6 +87,10 @@ class ExperimentLedger:
         """Return set of all model names that have records in the ledger."""
         return set(self._completed_models)
 
+    def get_model_evaluation_count(self, model_name: str) -> int:
+        """Return total number of completed evaluation rows for a given model."""
+        return self._model_eval_counts.get(str(model_name), 0)
+
     def get_baseline_metrics(self, sample_id: str, model_name: str) -> Optional[Dict[str, Any]]:
         """Return cached baseline metrics for (sample_id, model_name) if available."""
         return self._baseline_metrics.get((str(sample_id), str(model_name)))
@@ -89,17 +98,50 @@ class ExperimentLedger:
     def is_model_fully_completed(
         self,
         model_name: str,
-        sample_ids: List[str],
-        transform_keys: List[Tuple[str, str]],
+        sample_ids: Optional[List[str]] = None,
+        transform_keys: Optional[List[Tuple[str, str]]] = None,
+        expected_sample_count: Optional[int] = None,
     ) -> bool:
-        """Check if every expected (sample_id, model_name, transform, severity) is completed."""
-        if not sample_ids or not transform_keys:
-            return False
+        """Check if every expected (sample_id, model_name, transform, severity) is completed.
+
+        If sample_ids is provided, performs exact matching per sample ID.
+        If sample_ids is None, performs a fast in-memory check using expected_sample_count
+        and transform_keys without requiring expensive dataset row decoding.
+        """
+        transform_keys = transform_keys or []
         m = str(model_name)
-        for sid in sample_ids:
-            for t_name, t_sev in transform_keys:
-                if (str(sid), m, str(t_name), str(t_sev)) not in self._completed_evals:
-                    return False
+        if m not in self._completed_models:
+            return False
+
+        if sample_ids is not None:
+            if not sample_ids or not transform_keys:
+                return False
+            for sid in sample_ids:
+                for t_name, t_sev in transform_keys:
+                    if (str(sid), m, str(t_name), str(t_sev)) not in self._completed_evals:
+                        return False
+            return True
+
+        if not transform_keys:
+            return False
+        n_samples = expected_sample_count or 0
+        if n_samples <= 0:
+            return False
+
+        expected_total = n_samples * len(transform_keys)
+        if self.get_model_evaluation_count(m) < expected_total:
+            return False
+
+        # Verify distinct sample count and transform coverage for this model
+        model_sids = [sid for (m_key, sid) in self._model_sample_transforms.keys() if m_key == m]
+        if len(model_sids) < n_samples:
+            return False
+
+        expected_transforms = set(transform_keys)
+        for sid in model_sids:
+            if not expected_transforms.issubset(self._model_sample_transforms[(m, sid)]):
+                return False
+
         return True
 
     def get_model_progress(
@@ -134,6 +176,8 @@ class ExperimentLedger:
         key = (sid, mod, t_name, t_sev)
         self._completed_evals.add(key)
         self._completed_models.add(mod)
+        self._model_eval_counts[mod] += 1
+        self._model_sample_transforms[(mod, sid)].add((t_name, t_sev))
 
         if t_name == "identity" and t_sev == "original":
             self._baseline_metrics[(sid, mod)] = dict(row)

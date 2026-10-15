@@ -161,3 +161,45 @@ def test_skip_existing_models_defaults_to_true():
     """Verify ModelConfig.skip_existing_models defaults to True."""
     cfg = ModelConfig()
     assert cfg.skip_existing_models is True
+
+
+def test_ledger_fast_path_model_completion_without_sample_ids():
+    """Verify is_model_fully_completed fast in-memory check without explicit sample IDs."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        m_csv = os.path.join(tmpdir, "metrics.csv")
+        d_csv = os.path.join(tmpdir, "diag.csv")
+
+        ledger = ExperimentLedger(m_csv, d_csv)
+        transforms = [("identity", "original"), ("jpeg_compression", "Q=75")]
+
+        assert not ledger.is_model_fully_completed(
+            "sparsevit",
+            sample_ids=None,
+            transform_keys=transforms,
+            expected_sample_count=2,
+        )
+
+        for sid in ["s1", "s2"]:
+            for t_name, t_sev in transforms:
+                ledger.record_metric_row({
+                    "sample_id": sid,
+                    "model": "sparsevit",
+                    "transform_name": t_name,
+                    "severity_label": t_sev,
+                })
+
+        # Now sparsevit has 2 samples * 2 transforms = 4 evaluations
+        assert ledger.get_model_evaluation_count("sparsevit") == 4
+        assert ledger.is_model_fully_completed(
+            "sparsevit",
+            sample_ids=None,
+            transform_keys=transforms,
+            expected_sample_count=2,
+        )
+        # But if we expected 3 samples, it is not completed
+        assert not ledger.is_model_fully_completed(
+            "sparsevit",
+            sample_ids=None,
+            transform_keys=transforms,
+            expected_sample_count=3,
+        )

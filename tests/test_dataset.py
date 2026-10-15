@@ -73,3 +73,17 @@ def test_validator_detects_authentic_with_nonempty_mask():
 
     reason = validator.validate_raw("bad_real", 0, img, mask, 0, "real", 0.0)
     assert reason == "AUTHENTIC_IMAGE_NONEMPTY_MASK"
+
+
+def test_dataset_adapter_instant_flags():
+    from transform_ai_detection.dataset.synthetic import SyntheticDatasetAdapter
+    from transform_ai_detection.dataset.tampered_combined import TamperedCombinedDatasetAdapter
+
+    assert SyntheticDatasetAdapter.can_instant_sample_ids is True
+    assert TamperedCombinedDatasetAdapter.can_instant_sample_ids is False
+
+
+def test_deterministic_sample_selection_is_sorted():
+    adapter = SyntheticDatasetAdapter(num_samples=50, seed=123)
+    s = adapter.deterministic_sample_indices(count=10, seed=42)
+    assert s == sorted(s)

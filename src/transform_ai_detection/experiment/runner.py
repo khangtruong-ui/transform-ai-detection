@@ -198,7 +198,6 @@ class ExperimentRunner:
         self._init_environment_and_manifest(dataset, sample_indices)
         transformations = self._build_transformations()
 
-        sample_ids_str = [dataset.get_sample_id(i) for i in sample_indices]
         transform_keys = [(t.get_metadata().name, t.get_metadata().severity_label) for t in transformations]
         skip_existing = getattr(self.config.models, "skip_existing_models", True)
 
@@ -206,11 +205,21 @@ class ExperimentRunner:
         if existing_models:
             logger.info(f"Discovered existing models in ledger: {sorted(list(existing_models))}")
 
+        # Only fetch sample IDs upfront if the dataset supports instant / non-network access
+        sample_ids_str: Optional[List[str]] = None
+        if getattr(dataset, "can_instant_sample_ids", False):
+            sample_ids_str = [dataset.get_sample_id(i) for i in sample_indices]
+
         # Instantiate active models
         models: Dict[str, BaseLocalizationModel] = {}
         target_device = self.config.models.device
         for m_name in self.config.models.models:
-            if skip_existing and self.ledger.is_model_fully_completed(m_name, sample_ids_str, transform_keys):
+            if skip_existing and self.ledger.is_model_fully_completed(
+                m_name,
+                sample_ids=sample_ids_str,
+                transform_keys=transform_keys,
+                expected_sample_count=len(sample_indices),
+            ):
                 logger.info(f"Model '{m_name}' is already fully completed in {self.output_dir}. Skipping model initialization.")
                 continue
 
@@ -233,8 +242,14 @@ class ExperimentRunner:
             f"Samples: {len(sample_indices)}"
         )
 
+        active_indices = sample_indices if models else []
+        if not models:
+            logger.info("All configured models are already fully evaluated in the ledger. Skipping evaluation loop.")
+
         # Main evaluation loop over samples
-        for idx in tqdm(sample_indices, desc="Evaluating samples"):
+        pbar = tqdm(active_indices, desc="Evaluating samples", dynamic_ncols=True)
+        for idx in pbar:
+            pbar.set_postfix(sample_idx=idx, refresh=False)
             try:
                 sample: DatasetSample = dataset[idx]
             except Exception as e:

@@ -25,6 +25,8 @@ class TamperedCombinedDatasetAdapter(BaseDatasetAdapter):
     and HTTP Range-based streaming without downloading large files to disk.
     """
 
+    can_instant_sample_ids: bool = False
+
     def __init__(
         self,
         repo_id: str = "KhangTruong/Tampered-Images-Combined-Dataset",
@@ -38,6 +40,11 @@ class TamperedCombinedDatasetAdapter(BaseDatasetAdapter):
         self.streaming = streaming
         self.max_cached_row_groups = max_cached_row_groups
         self.validator = validator or DatasetValidator()
+        self._sample_id_cache: Dict[int, str] = {}
+        self._id_dataset: Optional[Any] = None
+
+        # Silence excessive urllib3 connection pool warnings during shard resolution
+        logging.getLogger("urllib3.connectionpool").setLevel(logging.ERROR)
 
         if pdl is None:
             raise ImportError(
@@ -58,8 +65,16 @@ class TamperedCombinedDatasetAdapter(BaseDatasetAdapter):
         return self._length
 
     def get_sample_id(self, index: int) -> str:
-        row = self._dataset[index]
-        return str(row.get("id", f"sample_{index}"))
+        if index in self._sample_id_cache:
+            return self._sample_id_cache[index]
+
+        # Use projected reader to transfer only 'id' column rather than heavy image/mask payloads
+        if self._id_dataset is None:
+            self._id_dataset = self._dataset.select_columns(["id"])
+        row = self._id_dataset[index]
+        sid = str(row.get("id", f"sample_{index}"))
+        self._sample_id_cache[index] = sid
+        return sid
 
     def __getitem__(self, index: int) -> DatasetSample:
         if index < 0 or index >= self._length:
@@ -67,6 +82,7 @@ class TamperedCombinedDatasetAdapter(BaseDatasetAdapter):
 
         row = self._dataset[index]
         sample_id = str(row.get("id", f"sample_{index}"))
+        self._sample_id_cache[index] = sample_id
 
         # Decode image
         image_data = row.get("image")
