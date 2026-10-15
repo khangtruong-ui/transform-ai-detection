@@ -35,11 +35,13 @@ def generate_master_report(output_dir: str) -> str:
     stat_tests = load_json("statistical_tests.json") or []
     run_sum = load_json("run_summary.json") or {}
 
-    # Load CSV artifacts
     def load_csv(name: str) -> pd.DataFrame:
         p = os.path.join(output_dir, name)
-        if os.path.exists(p):
-            return pd.read_csv(p)
+        if os.path.exists(p) and os.path.getsize(p) > 0:
+            try:
+                return pd.read_csv(p)
+            except Exception:
+                return pd.DataFrame()
         return pd.DataFrame()
 
     df_agg = load_csv("aggregate_metrics.csv")

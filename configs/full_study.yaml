@@ -41,8 +41,16 @@ models:
     - "dct_inconsistency_detector"
     - "deep_forensic_detector"
     - "trufor"
+    - "sparsevit"
+    - "iml_vit"
+    - "pscc_net"
+    - "code"
+    - "maskclip"
+    - "sida"
+    - "rita"
   device: "auto"
   batch_size: 1
+  skip_existing_models: true
 
 evaluation:
   threshold_policy: "fixed_0.5"

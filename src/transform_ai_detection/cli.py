@@ -38,6 +38,8 @@ def cmd_run(args: argparse.Namespace) -> None:
         config.output.output_dir = args.output_dir
     if args.max_samples is not None:
         config.dataset.max_samples = args.max_samples
+    if getattr(args, "skip_existing_models", False):
+        config.models.skip_existing_models = True
 
     runner = ExperimentRunner(config)
     summary = runner.run()
@@ -149,6 +151,11 @@ def main() -> None:
     p_run.add_argument("--config", "-c", required=True, help="Path to config.yaml")
     p_run.add_argument("--output-dir", "-o", default=None, help="Override output directory")
     p_run.add_argument("--max-samples", "-n", type=int, default=None, help="Override sample count")
+    p_run.add_argument(
+        "--skip-existing-models",
+        action="store_true",
+        help="Detect and skip models that already have completed evaluations in the results directory",
+    )
     p_run.set_defaults(func=cmd_run)
 
     # plot command

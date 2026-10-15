@@ -7,7 +7,10 @@ import logging
 from typing import Any, Dict, List, Optional
 import numpy as np
 from PIL import Image
-import parquet_dataset_loader as pdl
+try:
+    import parquet_dataset_loader as pdl
+except ImportError:
+    pdl = None
 
 from transform_ai_detection.dataset.base import BaseDatasetAdapter, DatasetSample
 from transform_ai_detection.dataset.validator import DatasetValidator
@@ -36,6 +39,11 @@ class TamperedCombinedDatasetAdapter(BaseDatasetAdapter):
         self.max_cached_row_groups = max_cached_row_groups
         self.validator = validator or DatasetValidator()
 
+        if pdl is None:
+            raise ImportError(
+                "The 'parquet-dataset-loader' package is required for TamperedCombinedDatasetAdapter. "
+                "Install it or use SyntheticDatasetAdapter instead."
+            )
         logger.info(f"Initializing Parquet dataset from {repo_id} (split: {split})")
         self._dataset = pdl.load_dataset(
             self.repo_id,

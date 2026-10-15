@@ -23,10 +23,13 @@ class SyntheticOracleModel(BaseLocalizationModel):
         name: str = "synthetic_oracle",
         noise_level: float = 0.05,
         threshold: float = 0.5,
+        device: str = "cpu",
+        **kwargs: Any,
     ) -> None:
         self._name = name
         self.noise_level = noise_level
         self.threshold = threshold
+        self.device = device
 
     @property
     def name(self) -> str:
@@ -75,9 +78,16 @@ class SyntheticOracleModel(BaseLocalizationModel):
 class MockConstantModel(BaseLocalizationModel):
     """Mock model returning constant predictions (e.g. all 0s or all 1s)."""
 
-    def __init__(self, constant_value: int = 0, name: str = "mock_constant") -> None:
+    def __init__(
+        self,
+        constant_value: int = 0,
+        name: str = "mock_constant",
+        device: str = "cpu",
+        **kwargs: Any,
+    ) -> None:
         self.constant_value = constant_value
         self._name = name
+        self.device = device
 
     @property
     def name(self) -> str:

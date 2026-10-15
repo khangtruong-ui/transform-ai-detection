@@ -24,6 +24,8 @@ class ExperimentLedger:
 
         self._completed_evals: Set[Tuple[str, str, str, str]] = set()
         self._diagnosed_samples: Set[Tuple[str, str, str]] = set()
+        self._completed_models: Set[str] = set()
+        self._baseline_metrics: Dict[Tuple[str, str], Dict[str, Any]] = {}
 
         self._metrics_fields: Optional[List[str]] = None
         self._diagnostics_fields: Optional[List[str]] = None
@@ -39,13 +41,17 @@ class ExperimentLedger:
                 req_cols = {"sample_id", "model", "transform_name", "severity_label"}
                 if req_cols.issubset(df.columns):
                     for _, row in df.iterrows():
-                        key = (
-                            str(row["sample_id"]),
-                            str(row["model"]),
-                            str(row["transform_name"]),
-                            str(row["severity_label"]),
-                        )
+                        sid = str(row["sample_id"])
+                        mod = str(row["model"])
+                        t_name = str(row["transform_name"])
+                        t_sev = str(row["severity_label"])
+                        key = (sid, mod, t_name, t_sev)
                         self._completed_evals.add(key)
+                        self._completed_models.add(mod)
+
+                        # Cache baseline metrics for delta computation and skipping
+                        if t_name == "identity" and t_sev == "original":
+                            self._baseline_metrics[(sid, mod)] = row.to_dict()
             except Exception:
                 pass
 
@@ -72,15 +78,65 @@ class ExperimentLedger:
         key = (str(sample_id), str(model_name), str(transform_name), str(severity_label))
         return key in self._completed_evals
 
+    def get_completed_models(self) -> Set[str]:
+        """Return set of all model names that have records in the ledger."""
+        return set(self._completed_models)
+
+    def get_baseline_metrics(self, sample_id: str, model_name: str) -> Optional[Dict[str, Any]]:
+        """Return cached baseline metrics for (sample_id, model_name) if available."""
+        return self._baseline_metrics.get((str(sample_id), str(model_name)))
+
+    def is_model_fully_completed(
+        self,
+        model_name: str,
+        sample_ids: List[str],
+        transform_keys: List[Tuple[str, str]],
+    ) -> bool:
+        """Check if every expected (sample_id, model_name, transform, severity) is completed."""
+        if not sample_ids or not transform_keys:
+            return False
+        m = str(model_name)
+        for sid in sample_ids:
+            for t_name, t_sev in transform_keys:
+                if (str(sid), m, str(t_name), str(t_sev)) not in self._completed_evals:
+                    return False
+        return True
+
+    def get_model_progress(
+        self,
+        model_name: str,
+        sample_ids: List[str],
+        transform_keys: List[Tuple[str, str]],
+    ) -> Dict[str, Any]:
+        """Calculate completion progress for a given model."""
+        m = str(model_name)
+        completed = 0
+        total = len(sample_ids) * len(transform_keys)
+        for sid in sample_ids:
+            for t_name, t_sev in transform_keys:
+                if (str(sid), m, str(t_name), str(t_sev)) in self._completed_evals:
+                    completed += 1
+        return {
+            "model": model_name,
+            "completed": completed,
+            "total": total,
+            "is_complete": completed >= total and total > 0,
+            "completion_ratio": completed / max(1, total),
+        }
+
     def record_metric_row(self, row: Dict[str, Any]) -> None:
         """Append a completed evaluation metric row to disk."""
-        key = (
-            str(row["sample_id"]),
-            str(row["model"]),
-            str(row["transform_name"]),
-            str(row["severity_label"]),
-        )
+        sid = str(row["sample_id"])
+        mod = str(row["model"])
+        t_name = str(row["transform_name"])
+        t_sev = str(row["severity_label"])
+
+        key = (sid, mod, t_name, t_sev)
         self._completed_evals.add(key)
+        self._completed_models.add(mod)
+
+        if t_name == "identity" and t_sev == "original":
+            self._baseline_metrics[(sid, mod)] = dict(row)
 
         file_exists = os.path.exists(self.metrics_csv_path) and os.path.getsize(self.metrics_csv_path) > 0
         if not file_exists or self._metrics_fields is None:
@@ -90,10 +146,8 @@ class ExperimentLedger:
                 writer.writeheader()
                 writer.writerow(row)
         else:
-            # If row has new keys not in existing header, append them
             new_keys = [k for k in row.keys() if k not in self._metrics_fields]
             if new_keys:
-                # Rewrite file with expanded columns
                 df = pd.read_csv(self.metrics_csv_path)
                 for k in new_keys:
                     df[k] = None

@@ -198,10 +198,22 @@ class ExperimentRunner:
         self._init_environment_and_manifest(dataset, sample_indices)
         transformations = self._build_transformations()
 
+        sample_ids_str = [dataset.get_sample_id(i) for i in sample_indices]
+        transform_keys = [(t.get_metadata().name, t.get_metadata().severity_label) for t in transformations]
+        skip_existing = getattr(self.config.models, "skip_existing_models", False)
+
+        existing_models = self.ledger.get_completed_models()
+        if existing_models:
+            logger.info(f"Discovered existing models in ledger: {sorted(list(existing_models))}")
+
         # Instantiate active models
         models: Dict[str, BaseLocalizationModel] = {}
         target_device = self.config.models.device
         for m_name in self.config.models.models:
+            if skip_existing and self.ledger.is_model_fully_completed(m_name, sample_ids_str, transform_keys):
+                logger.info(f"Model '{m_name}' is already fully completed in {self.output_dir}. Skipping model initialization.")
+                continue
+
             m_kw = dict(self.config.models.model_kwargs.get(m_name, {}))
             if "device" not in m_kw:
                 m_kw["device"] = target_device
@@ -257,9 +269,11 @@ class ExperimentRunner:
             baseline_metrics: Dict[str, Dict[str, Any]] = {}
             for m_name, model in models.items():
                 if self.ledger.is_completed(sample.sample_id, m_name, "identity", "original"):
-                    # We still need baseline metrics in memory for deltas; if already evaluated,
-                    # we can run or we compute baseline output quickly
-                    pass
+                    cached_base = self.ledger.get_baseline_metrics(sample.sample_id, m_name)
+                    if cached_base is not None:
+                        logger.debug(f"Skipping baseline for model {m_name} on sample {sample.sample_id} (already completed)")
+                        baseline_metrics[m_name] = cached_base
+                        continue
 
                 try:
                     out: ModelOutput = model.predict(sample.image)

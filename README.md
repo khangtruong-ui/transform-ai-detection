@@ -2,7 +2,7 @@
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Tests: Pytest](https://img.shields.io/badge/tests-34%20passing-brightgreen.svg)](tests/)
+[![Tests: Pytest](https://img.shields.io/badge/tests-47%20passing-brightgreen.svg)](tests/)
 
 A reproducible, inference-only research codebase designed to study how classical image transformations impact pretrained AI image manipulation localization (IML) models, and how intrinsic image/mask geometric and morphological properties govern localization success and failure.
 
@@ -123,14 +123,35 @@ iml-robustness validate-dataset --repo KhangTruong/Tampered-Images-Combined-Data
 
 ## 5. Pretrained Models & Forensic Baselines
 
-The framework defines an extensible `BaseLocalizationModel` interface. Included models:
+The framework defines an extensible `BaseLocalizationModel` interface with standardized outputs (`binary_mask`, `probability_map`, `inference_time_ms`). Included models span classical heuristics, constrained deep CNNs, and state-of-the-art vision transformers and multimodal models from recent literature (e.g. arXiv:2608.20929):
 
+### Classical & Deep Forensic Baselines
 1. **`ela_detector` (Error Level Analysis)**: Evaluates compression artifact discrepancies by computing recompression error variance across local sliding windows. Accelerated with PyTorch CUDA tensors when GPU is available.
 2. **`noise_residual_detector` (Noise Residual Inconsistency)**: Convolves high-pass spatial rich model (SRM) or Laplacian kernels to extract noise residuals, localizing regions where sensor noise statistics depart from background. Accelerated with PyTorch CUDA 2D convolutions.
 3. **`dct_inconsistency_detector` (Frequency Inconsistency)**: Measures Discrete Cosine Transform 8x8 block boundary discontinuities and energy discrepancies. Accelerated via PyTorch CUDA tensor average pooling.
 4. **`deep_forensic_detector` (Deep Constrained CNN)**: Deep PyTorch convolutional architecture featuring adaptive Bayar-constrained residual filters ($w_{0,0} = -1, \sum_{i,j \neq 0} w_{i,j} = 1$) suppressing scene content while isolating synthetic tampering artifacts. Fully executed on GPU CUDA.
-5. **`trufor` (TruFor Model Adapter)**: Deep learning RGB and Noiseprint++ cross-modal transformer adapter. Gracefully checks checkpoint availability and hardware capabilities.
-6. **`synthetic_oracle` / `synthetic_noisy`**: Deterministic mock models for offline ablation and CI/CD testing.
+5. **`synthetic_oracle` / `synthetic_noisy`**: Deterministic mock models for offline ablation and CI/CD testing.
+
+### Integrated Research Models (arXiv:2608.20929)
+6. **`sparsevit` (SparseViT)**: Non-semantics-centered sparse coding transformer for manipulation localization (Su et al., AAAI 2025). Uses sparse attention token selection to bypass high-level semantic dominance and isolate high-frequency boundary artifacts.
+7. **`iml_vit` (IML-ViT)**: Vision Transformer benchmark for image manipulation localization (Ma et al., AAAI 2024). Features hierarchical multi-stage patch embeddings with top-down progressive feature aggregation.
+8. **`pscc_net` (PSCC-Net)**: Progressive Spatio-Channel Correlation Network (Liu et al., IEEE TCSVT 2022). Employs multi-scale spatial correlation modules (SCM) and channel correlation modules (CCM) with progressive coarse-to-fine mask refinement.
+9. **`trufor` (TruFor)**: Trustworthy Forgery Detection and Localization (Guillaro et al., CVPR 2023). Dual-branch architecture fusing RGB representations with a learned Noiseprint++ residual stream via cross-modal attention.
+10. **`code` (CoDE)**: Decision-Making Environment for Image Forgery Localization (Peng et al., IEEE TIFS 2024). Reinforcement learning formulation combining discrete regional state decisions with continuous boundary refinement.
+11. **`maskclip` (MaskCLIP)**: Pretrained vision-model dense feature fusion for manipulation localization (Wang et al., CVPR 2025). Modifies CLIP's visual token attention via 1x1 dense convolutions to extract localized manipulation artifacts.
+12. **`sida` (SIDA)**: Social media image deepfake detection, localization and explanation with large multimodal architecture (Huang et al., CVPR 2025). Uses learnable forensic prompt query embeddings interacting across multi-scale visual features.
+13. **`rita` (RITA)**: Process-aware autoregressive localizer for realistic manipulation scenarios (Zhu et al., CVPR Findings 2026). Models sequential manipulation steps and post-processing distortions via causal autoregressive transformer blocks and boundary refinement.
+
+### Checkpoint Loading & Availability
+All deep models support checkpoint loading via `checkpoint_path` or standard cache directories (`~/.cache/iml_models/{model}.pth`, `checkpoints/{model}.pth`). When model weights are absent:
+- If `require_checkpoint=False` (default for inference & integration testing), the model automatically initializes its integrated PyTorch architecture with deterministic forensic priors and executes on GPU CUDA or CPU.
+- If `require_checkpoint=True`, the model gracefully reports `is_available() -> False` without failing ungracefully.
+
+### Existing Model Detection & Skipping
+To save compute and resume experiments seamlessly without re-running completed models:
+- **Ledger-Level Model Detection**: The `ExperimentLedger` tracks completed models, sample evaluations, and caches baseline metrics.
+- **Model Skipping**: When `--skip-existing-models` is specified via CLI or `skip_existing_models: true` is configured in YAML, any model that has already completed all sample and transformation evaluations in the output directory is detected and skipped before initialization, conserving GPU VRAM and execution time.
+- **Baseline Metric Caching**: When resuming, existing baseline (identity) evaluations are loaded directly from the ledger rather than recomputed.
 
 Inspect registered models:
 ```bash
