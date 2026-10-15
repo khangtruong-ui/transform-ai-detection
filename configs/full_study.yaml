@@ -39,6 +39,7 @@ models:
     - "ela_detector"
     - "noise_residual_detector"
     - "dct_inconsistency_detector"
+    - "deep_forensic_detector"
     - "trufor"
   device: "auto"
   batch_size: 1

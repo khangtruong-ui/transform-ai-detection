@@ -6,6 +6,7 @@ from transform_ai_detection.models.baselines import (
     NoiseResidualModel,
     DCTInconsistencyModel,
 )
+from transform_ai_detection.models.deep_forensic import DeepForensicModel, BayarConv2d
 from transform_ai_detection.models.synthetic import (
     SyntheticOracleModel,
     MockConstantModel,
@@ -19,6 +20,8 @@ __all__ = [
     "ErrorLevelAnalysisModel",
     "NoiseResidualModel",
     "DCTInconsistencyModel",
+    "DeepForensicModel",
+    "BayarConv2d",
     "SyntheticOracleModel",
     "MockConstantModel",
     "TruForAdapter",

@@ -33,7 +33,8 @@ models:
     - "ela_detector"
     - "noise_residual_detector"
     - "dct_inconsistency_detector"
-  device: "cpu"
+    - "deep_forensic_detector"
+  device: "auto"
   batch_size: 1
 
 evaluation:

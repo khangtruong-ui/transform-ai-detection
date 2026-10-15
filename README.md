@@ -2,7 +2,7 @@
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Tests: Pytest](https://img.shields.io/badge/tests-31%20passing-brightgreen.svg)](tests/)
+[![Tests: Pytest](https://img.shields.io/badge/tests-34%20passing-brightgreen.svg)](tests/)
 
 A reproducible, inference-only research codebase designed to study how classical image transformations impact pretrained AI image manipulation localization (IML) models, and how intrinsic image/mask geometric and morphological properties govern localization success and failure.
 
@@ -125,11 +125,12 @@ iml-robustness validate-dataset --repo KhangTruong/Tampered-Images-Combined-Data
 
 The framework defines an extensible `BaseLocalizationModel` interface. Included models:
 
-1. **`ela_detector` (Error Level Analysis)**: Evaluates compression artifact discrepancies by computing recompression error variance across local sliding windows. Fully CPU-capable.
-2. **`noise_residual_detector` (Noise Residual Inconsistency)**: Convolves high-pass spatial rich model (SRM) or Laplacian kernels to extract noise residuals, localizing regions where sensor noise statistics depart from background.
-3. **`dct_inconsistency_detector` (Frequency Inconsistency)**: Measures Discrete Cosine Transform 8x8 block boundary discontinuities and energy discrepancies.
-4. **`trufor` (TruFor Model Adapter)**: Deep learning RGB and Noiseprint++ cross-modal transformer adapter. Gracefully checks checkpoint availability and hardware capabilities.
-5. **`synthetic_oracle` / `synthetic_noisy`**: Deterministic mock models for offline ablation and CI/CD testing.
+1. **`ela_detector` (Error Level Analysis)**: Evaluates compression artifact discrepancies by computing recompression error variance across local sliding windows. Accelerated with PyTorch CUDA tensors when GPU is available.
+2. **`noise_residual_detector` (Noise Residual Inconsistency)**: Convolves high-pass spatial rich model (SRM) or Laplacian kernels to extract noise residuals, localizing regions where sensor noise statistics depart from background. Accelerated with PyTorch CUDA 2D convolutions.
+3. **`dct_inconsistency_detector` (Frequency Inconsistency)**: Measures Discrete Cosine Transform 8x8 block boundary discontinuities and energy discrepancies. Accelerated via PyTorch CUDA tensor average pooling.
+4. **`deep_forensic_detector` (Deep Constrained CNN)**: Deep PyTorch convolutional architecture featuring adaptive Bayar-constrained residual filters ($w_{0,0} = -1, \sum_{i,j \neq 0} w_{i,j} = 1$) suppressing scene content while isolating synthetic tampering artifacts. Fully executed on GPU CUDA.
+5. **`trufor` (TruFor Model Adapter)**: Deep learning RGB and Noiseprint++ cross-modal transformer adapter. Gracefully checks checkpoint availability and hardware capabilities.
+6. **`synthetic_oracle` / `synthetic_noisy`**: Deterministic mock models for offline ablation and CI/CD testing.
 
 Inspect registered models:
 ```bash
@@ -198,6 +199,12 @@ Generate or customize publication figures without rerunning model inference:
 iml-robustness plot --results-dir results/quick_study
 ```
 
+### 6. Generating Master Research Markdown Report
+Generate a publication-ready comprehensive Markdown report (`master_report.md`) embedding hardware specs, dataset exclusions, bootstrap CIs, paired tests, confounder-controlled partial correlations, and figures:
+```bash
+iml-robustness report --results-dir results/quick_study
+```
+
 ---
 
 ## 8. Metric Definitions & Statistical Analysis
@@ -251,6 +258,7 @@ results/<experiment_name>/
 ├── stratification_by_method.csv   # Performance broken down by generator method
 ├── stratification_by_mask_area.csv# Performance broken down by mask area tiers
 ├── run_summary.json               # Top-level machine-readable execution summary
+├── master_report.md               # Synthesized master research report (Markdown)
 └── plots/                         # Publication figures (PNG at 300 DPI and vector PDF)
     ├── perf_vs_severity_iou.png
     ├── perf_vs_severity_f1.png

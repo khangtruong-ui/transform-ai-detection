@@ -10,6 +10,7 @@ import os
 
 from transform_ai_detection.config import ExperimentConfig, DatasetConfig, ModelConfig, TransformationConfig
 from transform_ai_detection.experiment.runner import ExperimentRunner
+from transform_ai_detection.experiment.master_report import generate_master_report
 from transform_ai_detection.visualization.plot_all import generate_all_plots
 from transform_ai_detection.models.registry import ModelRegistry
 from transform_ai_detection.transformations.base import TransformationRegistry
@@ -59,6 +60,14 @@ def cmd_plot(args: argparse.Namespace) -> None:
     logger.info(f"Generating publication plots from results at: {output_dir}")
     generate_all_plots(output_dir, export_formats=["png", "pdf"])
     logger.info("Plotting complete.")
+
+
+def cmd_report(args: argparse.Namespace) -> None:
+    """Generate or regenerate the comprehensive master Markdown report from disk results."""
+    output_dir = os.path.abspath(args.results_dir)
+    logger.info(f"Generating master Markdown research report from: {output_dir}")
+    report_file = generate_master_report(output_dir)
+    print(f"\nMaster report generated successfully: {report_file}\n")
 
 
 def cmd_smoke_test(args: argparse.Namespace) -> None:
@@ -146,6 +155,11 @@ def main() -> None:
     p_plot = subparsers.add_parser("plot", help="Generate publication plots from saved results")
     p_plot.add_argument("--results-dir", "-r", required=True, help="Path to results directory")
     p_plot.set_defaults(func=cmd_plot)
+
+    # report command
+    p_rep = subparsers.add_parser("report", help="Generate master Markdown report from saved results")
+    p_rep.add_argument("--results-dir", "-r", required=True, help="Path to results directory")
+    p_rep.set_defaults(func=cmd_report)
 
     # smoke-test command
     p_smoke = subparsers.add_parser("smoke-test", help="Run quick synthetic CPU smoke test")

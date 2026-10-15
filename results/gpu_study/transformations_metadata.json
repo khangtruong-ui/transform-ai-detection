@@ -1,0 +1,148 @@
+[
+  {
+    "name": "identity",
+    "severity_level": 0,
+    "severity_label": "original",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {},
+    "limitations": "Reference baseline. No transformation applied.",
+    "deterministic_hash": "196880f650ef"
+  },
+  {
+    "name": "jpeg_compression",
+    "severity_level": 90,
+    "severity_label": "Q=90",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {
+      "quality": 90
+    },
+    "limitations": "Introduces 8x8 DCT block artifacts and chroma subsampling. May suppress high-frequency forensic noise patterns.",
+    "deterministic_hash": "f2e9f486332c"
+  },
+  {
+    "name": "jpeg_compression",
+    "severity_level": 75,
+    "severity_label": "Q=75",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {
+      "quality": 75
+    },
+    "limitations": "Introduces 8x8 DCT block artifacts and chroma subsampling. May suppress high-frequency forensic noise patterns.",
+    "deterministic_hash": "c48310f55e71"
+  },
+  {
+    "name": "jpeg_compression",
+    "severity_level": 50,
+    "severity_label": "Q=50",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {
+      "quality": 50
+    },
+    "limitations": "Introduces 8x8 DCT block artifacts and chroma subsampling. May suppress high-frequency forensic noise patterns.",
+    "deterministic_hash": "992edea5d270"
+  },
+  {
+    "name": "gaussian_blur",
+    "severity_level": 1.0,
+    "severity_label": "sigma=1.0",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {
+      "sigma": 1.0
+    },
+    "limitations": "Low-pass filtering attenuates high-frequency sensor noise and synthetic generator boundary artifacts.",
+    "deterministic_hash": "b33bec11b31d"
+  },
+  {
+    "name": "gaussian_blur",
+    "severity_level": 2.0,
+    "severity_label": "sigma=2.0",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {
+      "sigma": 2.0
+    },
+    "limitations": "Low-pass filtering attenuates high-frequency sensor noise and synthetic generator boundary artifacts.",
+    "deterministic_hash": "e1b72514d3c7"
+  },
+  {
+    "name": "downscale_upscale",
+    "severity_level": 0.75,
+    "severity_label": "scale=0.75",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {
+      "scale_factor": 0.75
+    },
+    "limitations": "Simulates resolution downsampling across web pipelines. Preserves original canvas geometry but destroys sub-pixel boundary traces.",
+    "deterministic_hash": "1bb454d2ba56"
+  },
+  {
+    "name": "downscale_upscale",
+    "severity_level": 0.5,
+    "severity_label": "scale=0.50",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {
+      "scale_factor": 0.5
+    },
+    "limitations": "Simulates resolution downsampling across web pipelines. Preserves original canvas geometry but destroys sub-pixel boundary traces.",
+    "deterministic_hash": "d426c4bd3514"
+  },
+  {
+    "name": "brightness_contrast",
+    "severity_level": {
+      "brightness": 1.2,
+      "contrast": 1.2
+    },
+    "severity_label": "B=1.2_C=1.2",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {
+      "factor_brightness": 1.2,
+      "factor_contrast": 1.2
+    },
+    "limitations": "May clip highlight or shadow detail, potentially altering luminance consistency across manipulated boundaries.",
+    "deterministic_hash": "7b2b2de9e4ca"
+  },
+  {
+    "name": "brightness_contrast",
+    "severity_level": {
+      "brightness": 0.8,
+      "contrast": 0.8
+    },
+    "severity_label": "B=0.8_C=0.8",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {
+      "factor_brightness": 0.8,
+      "factor_contrast": 0.8
+    },
+    "limitations": "May clip highlight or shadow detail, potentially altering luminance consistency across manipulated boundaries.",
+    "deterministic_hash": "6b2a51567c29"
+  }
+]

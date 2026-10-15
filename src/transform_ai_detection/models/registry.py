@@ -2,18 +2,20 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List, Type
+from typing import Any, Callable, Dict, List, Optional
 from transform_ai_detection.models.base import BaseLocalizationModel
 from transform_ai_detection.models.baselines import (
     ErrorLevelAnalysisModel,
     NoiseResidualModel,
     DCTInconsistencyModel,
 )
+from transform_ai_detection.models.deep_forensic import DeepForensicModel
 from transform_ai_detection.models.synthetic import (
     SyntheticOracleModel,
     MockConstantModel,
 )
 from transform_ai_detection.models.trufor import TruForAdapter
+from transform_ai_detection.hardware import get_torch_device
 
 
 class ModelRegistry:
@@ -23,6 +25,7 @@ class ModelRegistry:
         "ela_detector": lambda **kw: ErrorLevelAnalysisModel(**kw),
         "noise_residual_detector": lambda **kw: NoiseResidualModel(**kw),
         "dct_inconsistency_detector": lambda **kw: DCTInconsistencyModel(**kw),
+        "deep_forensic_detector": lambda **kw: DeepForensicModel(**kw),
         "trufor": lambda **kw: TruForAdapter(**kw),
         "synthetic_oracle": lambda **kw: SyntheticOracleModel(name="synthetic_oracle", **kw),
         "synthetic_noisy": lambda **kw: SyntheticOracleModel(name="synthetic_noisy", noise_level=0.2, **kw),
@@ -46,12 +49,17 @@ class ModelRegistry:
 
     @classmethod
     def generate_availability_report(
-        cls, model_names: List[str], model_kwargs: Dict[str, Dict[str, Any]] = None
+        cls,
+        model_names: List[str],
+        model_kwargs: Optional[Dict[str, Dict[str, Any]]] = None,
+        default_device: str = "auto",
     ) -> List[Dict[str, Any]]:
         model_kwargs = model_kwargs or {}
         report = []
         for name in model_names:
-            kw = model_kwargs.get(name, {})
+            kw = dict(model_kwargs.get(name, {}))
+            if "device" not in kw:
+                kw["device"] = default_device
             try:
                 model = cls.create(name, **kw)
                 info = model.get_model_info()

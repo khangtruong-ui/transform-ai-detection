@@ -1,0 +1,51 @@
+[
+  {
+    "name": "ela_detector",
+    "family": "forensic_compression_analysis",
+    "device": "cuda:0",
+    "parameters": {
+      "recompress_quality": 90,
+      "threshold": 0.5,
+      "smoothing_sigma": 2.0
+    },
+    "description": "Error Level Analysis: detects JPEG recompression artifact discrepancies.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "noise_residual_detector",
+    "family": "noise_inconsistency",
+    "device": "cuda:0",
+    "parameters": {
+      "threshold": 0.5,
+      "window_size": 15,
+      "filter_type": "laplacian"
+    },
+    "description": "High-pass spatial noise residual variance inconsistency detector.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "dct_inconsistency_detector",
+    "family": "frequency_domain",
+    "device": "cuda:0",
+    "parameters": {
+      "threshold": 0.5
+    },
+    "description": "Local 8x8 block boundary discontinuity and energy inconsistency.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "deep_forensic_detector",
+    "family": "deep_constrained_cnn",
+    "device": "cuda:0",
+    "parameters": {
+      "threshold": 0.5,
+      "architecture": "BayarConv2d + MultiScaleResNet"
+    },
+    "description": "Deep PyTorch neural network with adaptive Bayar constrained residual convolutions.",
+    "registered": true,
+    "load_successful": true
+  }
+]

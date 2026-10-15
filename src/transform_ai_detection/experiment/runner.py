@@ -47,6 +47,7 @@ from transform_ai_detection.diagnostics.error_diag import compute_post_inference
 from transform_ai_detection.failure_analysis.classifier import FailureClassifier
 from transform_ai_detection.experiment.ledger import ExperimentLedger
 from transform_ai_detection.experiment.summary import ExperimentSummaryGenerator
+from transform_ai_detection.experiment.master_report import generate_master_report
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +97,9 @@ class ExperimentRunner:
 
         # Save models availability report
         models_report = ModelRegistry.generate_availability_report(
-            self.config.models.models, self.config.models.model_kwargs
+            self.config.models.models,
+            self.config.models.model_kwargs,
+            default_device=self.config.models.device,
         )
         with open(os.path.join(self.output_dir, "models_report.json"), "w", encoding="utf-8") as f:
             json.dump(models_report, f, indent=2)
@@ -197,8 +200,11 @@ class ExperimentRunner:
 
         # Instantiate active models
         models: Dict[str, BaseLocalizationModel] = {}
+        target_device = self.config.models.device
         for m_name in self.config.models.models:
-            m_kw = self.config.models.model_kwargs.get(m_name, {})
+            m_kw = dict(self.config.models.model_kwargs.get(m_name, {}))
+            if "device" not in m_kw:
+                m_kw["device"] = target_device
             try:
                 mod = ModelRegistry.create(m_name, **m_kw)
                 if mod.is_available():
@@ -439,5 +445,11 @@ class ExperimentRunner:
         summary["duration_seconds"] = round(time.time() - start_time, 2)
         summary["total_evaluations_completed"] = self.ledger.completed_count
 
+        # Generate Master Markdown Research Report
+        logger.info("Generating master research report in Markdown...")
+        report_file = generate_master_report(self.output_dir)
+        summary["master_report_path"] = report_file
+
         logger.info(f"Experiment {self.config.name} finished in {summary['duration_seconds']}s.")
+        logger.info(f"Master Markdown Report saved to: {report_file}")
         return summary

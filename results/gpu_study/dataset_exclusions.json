@@ -1,0 +1,11 @@
+[
+  {
+    "sample_id": "tgif_flux1dev_42296_0",
+    "index": 8935,
+    "reason": "FAKE_IMAGE_EMPTY_MASK",
+    "details": {
+      "label": 1,
+      "computed_mask_ratio": 0.0
+    }
+  }
+]
