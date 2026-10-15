@@ -1,0 +1,52 @@
+{
+  "models": [
+    "ela_detector",
+    "noise_residual_detector",
+    "synthetic_oracle"
+  ],
+  "n_samples_complete": 50,
+  "all_models_failed_count": 25,
+  "all_models_failed_rate": 0.5,
+  "no_models_failed_count": 0,
+  "no_models_failed_rate": 0.0,
+  "model_specific_failure_count": 15,
+  "model_specific_breakdown": {
+    "ela_detector": 0,
+    "noise_residual_detector": 0,
+    "synthetic_oracle": 15
+  },
+  "pairwise_jaccard_similarity": {
+    "ela_detector": {
+      "ela_detector": 1.0,
+      "noise_residual_detector": 0.7142857142857143,
+      "synthetic_oracle": 0.7
+    },
+    "noise_residual_detector": {
+      "ela_detector": 0.7142857142857143,
+      "noise_residual_detector": 1.0,
+      "synthetic_oracle": 0.5
+    },
+    "synthetic_oracle": {
+      "ela_detector": 0.7,
+      "noise_residual_detector": 0.5,
+      "synthetic_oracle": 1.0
+    }
+  },
+  "pairwise_correlation": {
+    "ela_detector": {
+      "ela_detector": 0.9999999999999999,
+      "noise_residual_detector": 0.6546536707079771,
+      "synthetic_oracle": 0.0
+    },
+    "noise_residual_detector": {
+      "ela_detector": 0.654653670707977,
+      "noise_residual_detector": 0.9999999999999998,
+      "synthetic_oracle": 0.0
+    },
+    "synthetic_oracle": {
+      "ela_detector": 0.0,
+      "noise_residual_detector": 0.0,
+      "synthetic_oracle": 1.0
+    }
+  }
+}

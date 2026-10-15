@@ -1,0 +1,70 @@
+[
+  {
+    "name": "identity",
+    "severity_level": 0,
+    "severity_label": "original",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {},
+    "limitations": "Reference baseline. No transformation applied.",
+    "deterministic_hash": "196880f650ef"
+  },
+  {
+    "name": "jpeg_compression",
+    "severity_level": 75,
+    "severity_label": "Q=75",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {
+      "quality": 75
+    },
+    "limitations": "Introduces 8x8 DCT block artifacts and chroma subsampling. May suppress high-frequency forensic noise patterns.",
+    "deterministic_hash": "c48310f55e71"
+  },
+  {
+    "name": "jpeg_compression",
+    "severity_level": 50,
+    "severity_label": "Q=50",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {
+      "quality": 50
+    },
+    "limitations": "Introduces 8x8 DCT block artifacts and chroma subsampling. May suppress high-frequency forensic noise patterns.",
+    "deterministic_hash": "992edea5d270"
+  },
+  {
+    "name": "gaussian_blur",
+    "severity_level": 1.5,
+    "severity_label": "sigma=1.5",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {
+      "sigma": 1.5
+    },
+    "limitations": "Low-pass filtering attenuates high-frequency sensor noise and synthetic generator boundary artifacts.",
+    "deterministic_hash": "427d4c36e382"
+  },
+  {
+    "name": "downscale_upscale",
+    "severity_level": 0.5,
+    "severity_label": "scale=0.50",
+    "changes_geometry": false,
+    "changes_dimensions": false,
+    "requires_mask_interpolation": false,
+    "mask_interpolation_mode": "none",
+    "parameters": {
+      "scale_factor": 0.5
+    },
+    "limitations": "Simulates resolution downsampling across web pipelines. Preserves original canvas geometry but destroys sub-pixel boundary traces.",
+    "deterministic_hash": "d426c4bd3514"
+  }
+]

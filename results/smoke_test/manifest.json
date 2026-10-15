@@ -1,0 +1,20 @@
+{
+  "dataset_name": "KhangTruong/Tampered-Images-Combined-Dataset",
+  "adapter": "synthetic",
+  "split": "cross_test",
+  "total_dataset_rows": 10,
+  "selected_sample_count": 10,
+  "sample_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "seed": 42
+}

@@ -1,0 +1,40 @@
+[
+  {
+    "name": "ela_detector",
+    "family": "forensic_compression_analysis",
+    "device": "cpu",
+    "parameters": {
+      "recompress_quality": 90,
+      "threshold": 0.5,
+      "smoothing_sigma": 2.0
+    },
+    "description": "Error Level Analysis: detects JPEG recompression artifact discrepancies.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "noise_residual_detector",
+    "family": "noise_inconsistency",
+    "device": "cpu",
+    "parameters": {
+      "threshold": 0.5,
+      "window_size": 15,
+      "filter_type": "laplacian"
+    },
+    "description": "High-pass spatial noise residual variance inconsistency detector.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "synthetic_oracle",
+    "family": "synthetic_mock",
+    "device": "cpu",
+    "parameters": {
+      "noise_level": 0.05,
+      "threshold": 0.5
+    },
+    "description": "Deterministic mock model for ablation and unit tests.",
+    "registered": true,
+    "load_successful": true
+  }
+]

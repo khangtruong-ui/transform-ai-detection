@@ -1,0 +1,59 @@
+name: "synthetic_offline_benchmark"
+description: "Zero-download benchmark on deterministic synthetic tampering fixtures"
+
+dataset:
+  name: "synthetic"
+  adapter: "synthetic"
+  max_samples: 20
+  seed: 42
+
+transformations:
+  enabled_transforms:
+    - "identity"
+    - "jpeg_compression"
+    - "gaussian_blur"
+    - "downscale_upscale"
+    - "brightness_contrast"
+    - "gaussian_noise"
+    - "horizontal_flip"
+  severities:
+    jpeg_compression: [95, 75, 50, 25]
+    gaussian_blur: [1.0, 2.0, 3.0]
+    downscale_upscale: [0.75, 0.5, 0.25]
+    brightness_contrast:
+      - factor_brightness: 1.2
+        factor_contrast: 1.2
+      - factor_brightness: 0.8
+        factor_contrast: 0.8
+    gaussian_noise: [0.02, 0.05]
+    horizontal_flip: [1]
+  seed: 42
+
+models:
+  models:
+    - "ela_detector"
+    - "noise_residual_detector"
+    - "synthetic_oracle"
+  device: "cpu"
+  batch_size: 1
+
+evaluation:
+  threshold_policy: "fixed_0.5"
+  fixed_threshold: 0.5
+  boundary_tolerance: 3
+  compute_ranking_metrics: true
+  bootstrap_iterations: 1000
+  bootstrap_ci: 0.95
+  failure_metric: "iou"
+  failure_threshold: 0.3
+  degradation_failure_delta: -0.2
+
+output:
+  output_dir: "results/synthetic_benchmark"
+  save_predictions: false
+  save_visualizations: true
+  save_per_image_diagnostics: true
+  plot_dpi: 300
+  export_formats:
+    - "png"
+    - "pdf"

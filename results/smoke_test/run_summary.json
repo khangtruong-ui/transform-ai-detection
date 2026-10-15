@@ -1,0 +1,29 @@
+{
+  "total_evaluations": 150,
+  "unique_samples": 10,
+  "models_evaluated": [
+    "ela_detector",
+    "noise_residual_detector",
+    "synthetic_oracle"
+  ],
+  "transformations_evaluated": [
+    "downscale_upscale",
+    "gaussian_blur",
+    "identity",
+    "jpeg_compression"
+  ],
+  "overall_failure_rate": 0.7333333333333333,
+  "failure_analysis_summary": {
+    "all_models_failed_rate": 0.5,
+    "model_specific_failure_count": 15
+  },
+  "artifacts_generated": [
+    "aggregate_metrics.csv",
+    "aggregate_metrics.json",
+    "statistical_tests.json",
+    "correlations.csv",
+    "failure_analysis.json",
+    "stratification_by_method.csv",
+    "stratification_by_mask_area.csv"
+  ]
+}

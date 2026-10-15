@@ -1,0 +1,61 @@
+name: synthetic_smoke_test
+description: CPU smoke test using synthetic tampered images and forensic baselines
+dataset:
+  name: KhangTruong/Tampered-Images-Combined-Dataset
+  adapter: synthetic
+  split: cross_test
+  max_samples: 10
+  sample_indices: null
+  seed: 42
+  streaming: true
+  max_cached_row_groups: 2
+  filter_methods: null
+  filter_datasets: null
+  cache_dir: null
+  local_data_dir: null
+transformations:
+  enabled_transforms:
+  - identity
+  - jpeg_compression
+  - gaussian_blur
+  - downscale_upscale
+  severities:
+    jpeg_compression:
+    - 75
+    - 50
+    gaussian_blur:
+    - 1.5
+    downscale_upscale:
+    - 0.5
+  seed: 42
+  include_geometric: false
+  crop_size: null
+models:
+  models:
+  - ela_detector
+  - noise_residual_detector
+  - synthetic_oracle
+  device: cpu
+  batch_size: 1
+  inference_resolution: null
+  model_kwargs: {}
+evaluation:
+  threshold_policy: fixed_0.5
+  fixed_threshold: 0.5
+  boundary_tolerance: 3
+  compute_ranking_metrics: true
+  bootstrap_iterations: 1000
+  bootstrap_ci: 0.95
+  failure_metric: iou
+  failure_threshold: 0.3
+  degradation_failure_delta: -0.2
+  run_semantic_boundary_diagnostic: true
+output:
+  output_dir: results/smoke_test
+  save_predictions: false
+  save_visualizations: true
+  save_per_image_diagnostics: true
+  plot_dpi: 300
+  export_formats:
+  - png
+  - pdf

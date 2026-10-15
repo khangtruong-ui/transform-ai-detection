@@ -1,0 +1,52 @@
+{
+  "models": [
+    "dct_inconsistency_detector",
+    "ela_detector",
+    "noise_residual_detector"
+  ],
+  "n_samples_complete": 270,
+  "all_models_failed_count": 255,
+  "all_models_failed_rate": 0.9444444444444444,
+  "no_models_failed_count": 0,
+  "no_models_failed_rate": 0.0,
+  "model_specific_failure_count": 0,
+  "model_specific_breakdown": {
+    "dct_inconsistency_detector": 0,
+    "ela_detector": 0,
+    "noise_residual_detector": 0
+  },
+  "pairwise_jaccard_similarity": {
+    "dct_inconsistency_detector": {
+      "dct_inconsistency_detector": 1.0,
+      "ela_detector": 0.9962962962962963,
+      "noise_residual_detector": 0.9481481481481482
+    },
+    "ela_detector": {
+      "dct_inconsistency_detector": 0.9962962962962963,
+      "ela_detector": 1.0,
+      "noise_residual_detector": 0.9444444444444444
+    },
+    "noise_residual_detector": {
+      "dct_inconsistency_detector": 0.9481481481481482,
+      "ela_detector": 0.9444444444444444,
+      "noise_residual_detector": 1.0
+    }
+  },
+  "pairwise_correlation": {
+    "dct_inconsistency_detector": {
+      "dct_inconsistency_detector": 1.0,
+      "ela_detector": 0.0,
+      "noise_residual_detector": 0.0
+    },
+    "ela_detector": {
+      "dct_inconsistency_detector": 0.0,
+      "ela_detector": 1.0,
+      "noise_residual_detector": -0.014258304825805163
+    },
+    "noise_residual_detector": {
+      "dct_inconsistency_detector": 0.0,
+      "ela_detector": -0.014258304825805163,
+      "noise_residual_detector": 1.0
+    }
+  }
+}

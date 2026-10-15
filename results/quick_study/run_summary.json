@@ -1,0 +1,30 @@
+{
+  "total_evaluations": 810,
+  "unique_samples": 27,
+  "models_evaluated": [
+    "dct_inconsistency_detector",
+    "ela_detector",
+    "noise_residual_detector"
+  ],
+  "transformations_evaluated": [
+    "brightness_contrast",
+    "downscale_upscale",
+    "gaussian_blur",
+    "identity",
+    "jpeg_compression"
+  ],
+  "overall_failure_rate": 0.9814814814814815,
+  "failure_analysis_summary": {
+    "all_models_failed_rate": 0.9444444444444444,
+    "model_specific_failure_count": 0
+  },
+  "artifacts_generated": [
+    "aggregate_metrics.csv",
+    "aggregate_metrics.json",
+    "statistical_tests.json",
+    "correlations.csv",
+    "failure_analysis.json",
+    "stratification_by_method.csv",
+    "stratification_by_mask_area.csv"
+  ]
+}

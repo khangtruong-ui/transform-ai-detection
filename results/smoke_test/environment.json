@@ -1,0 +1,33 @@
+{
+  "platform": "Linux-6.8.0-146-generic-x86_64-with-glibc2.39",
+  "python_version": "3.12.14",
+  "cpu": {
+    "processor": "x86_64",
+    "cpu_count_logical": 24,
+    "cpu_count_physical": 12
+  },
+  "memory": {
+    "total_bytes": 33496141824,
+    "total_gb": 31.2,
+    "available_bytes": 17036537856,
+    "available_gb": 15.87
+  },
+  "disk": {
+    "total_gb": 48.0,
+    "free_gb": 47.01
+  },
+  "pytorch": {
+    "version": "2.11.0+cu128",
+    "cuda_available": true,
+    "gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 3070",
+        "total_memory_gb": 7.66,
+        "major": 8,
+        "minor": 6,
+        "multi_processor_count": 46
+      }
+    ]
+  }
+}
