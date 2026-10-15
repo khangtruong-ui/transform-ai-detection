@@ -2,7 +2,7 @@
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Tests: Pytest](https://img.shields.io/badge/tests-47%20passing-brightgreen.svg)](tests/)
+[![Tests: Pytest](https://img.shields.io/badge/tests-48%20passing-brightgreen.svg)](tests/)
 
 A reproducible, inference-only research codebase designed to study how classical image transformations impact pretrained AI image manipulation localization (IML) models, and how intrinsic image/mask geometric and morphological properties govern localization success and failure.
 
@@ -78,7 +78,7 @@ The framework evaluates three primary research hypotheses without assuming their
 ### Requirements
 - Python $\ge$ 3.9
 - PyTorch $\ge$ 2.0 (CPU or CUDA)
-- `parquet-dataset-loader >= 0.3.2`
+- `parquet-dataset-loader` ([github.com/khangtruong-ui/parquet-dataset-loader](https://github.com/khangtruong-ui/parquet-dataset-loader))
 
 ```bash
 # Clone the repository
@@ -149,9 +149,9 @@ All deep models support checkpoint loading via `checkpoint_path` or standard cac
 
 ### Existing Model Detection & Skipping
 To save compute and resume experiments seamlessly without re-running completed models:
-- **Ledger-Level Model Detection**: The `ExperimentLedger` tracks completed models, sample evaluations, and caches baseline metrics.
-- **Model Skipping**: When `--skip-existing-models` is specified via CLI or `skip_existing_models: true` is configured in YAML, any model that has already completed all sample and transformation evaluations in the output directory is detected and skipped before initialization, conserving GPU VRAM and execution time.
-- **Baseline Metric Caching**: When resuming, existing baseline (identity) evaluations are loaded directly from the ledger rather than recomputed.
+- **Default Behavior (`skip_existing_models: true`)**: Enabled by default in `ModelConfig`. Any model that has already completed all sample and transformation evaluations in the output directory is automatically detected and skipped before initialization, conserving GPU VRAM and compute time.
+- **CLI Flags**: The CLI defaults to skipping completed models (`--skip-existing-models`). To force re-evaluation of all models, specify `--no-skip-existing-models`.
+- **Baseline Metric Caching**: When resuming, existing baseline (identity) evaluations are loaded directly from the ledger rather than recomputed via neural forward passes.
 
 Inspect registered models:
 ```bash

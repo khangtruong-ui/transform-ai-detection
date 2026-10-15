@@ -36,10 +36,8 @@ def cmd_run(args: argparse.Namespace) -> None:
     config = ExperimentConfig.from_yaml(args.config)
     if args.output_dir:
         config.output.output_dir = args.output_dir
-    if args.max_samples is not None:
-        config.dataset.max_samples = args.max_samples
-    if getattr(args, "skip_existing_models", False):
-        config.models.skip_existing_models = True
+    if getattr(args, "skip_existing_models", None) is not None:
+        config.models.skip_existing_models = args.skip_existing_models
 
     runner = ExperimentRunner(config)
     summary = runner.run()
@@ -153,8 +151,16 @@ def main() -> None:
     p_run.add_argument("--max-samples", "-n", type=int, default=None, help="Override sample count")
     p_run.add_argument(
         "--skip-existing-models",
+        dest="skip_existing_models",
         action="store_true",
-        help="Detect and skip models that already have completed evaluations in the results directory",
+        default=True,
+        help="Detect and skip models that already have completed evaluations in results directory (default: True)",
+    )
+    p_run.add_argument(
+        "--no-skip-existing-models",
+        dest="skip_existing_models",
+        action="store_false",
+        help="Force re-evaluation of models even if existing evaluations are present in results directory",
     )
     p_run.set_defaults(func=cmd_run)
 

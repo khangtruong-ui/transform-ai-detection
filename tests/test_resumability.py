@@ -155,3 +155,9 @@ def test_runner_detect_existing_models_and_skip():
         summary2 = runner2.run()
         # No new evaluations performed, total stays 4
         assert summary2["total_evaluations_completed"] == 4
+
+
+def test_skip_existing_models_defaults_to_true():
+    """Verify ModelConfig.skip_existing_models defaults to True."""
+    cfg = ModelConfig()
+    assert cfg.skip_existing_models is True

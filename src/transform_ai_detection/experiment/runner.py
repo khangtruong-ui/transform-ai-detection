@@ -200,7 +200,7 @@ class ExperimentRunner:
 
         sample_ids_str = [dataset.get_sample_id(i) for i in sample_indices]
         transform_keys = [(t.get_metadata().name, t.get_metadata().severity_label) for t in transformations]
-        skip_existing = getattr(self.config.models, "skip_existing_models", False)
+        skip_existing = getattr(self.config.models, "skip_existing_models", True)
 
         existing_models = self.ledger.get_completed_models()
         if existing_models:
