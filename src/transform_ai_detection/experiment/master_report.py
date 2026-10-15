@@ -34,6 +34,7 @@ def generate_master_report(output_dir: str) -> str:
     fail_analysis = load_json("failure_analysis.json") or {}
     stat_tests = load_json("statistical_tests.json") or []
     run_sum = load_json("run_summary.json") or {}
+    oom_models = load_json("oom_models.json") or []
 
     def load_csv(name: str) -> pd.DataFrame:
         p = os.path.join(output_dir, name)
@@ -86,9 +87,11 @@ def generate_master_report(output_dir: str) -> str:
 
     # 3. Dataset Integrity & Exclusions
     lines.append("## 3. Dataset Characteristics & Integrity Verification\n")
+    tot_rows = manifest.get("total_dataset_rows", "N/A")
+    tot_rows_str = f"{tot_rows:,}" if isinstance(tot_rows, (int, float)) else str(tot_rows)
     lines.append(
         f"The experiment evaluated samples from `{manifest.get('dataset_name', 'Unknown')}` "
-        f"(split: `{manifest.get('split', 'default')}`, total archive rows: `{manifest.get('total_dataset_rows', 'N/A'):,}`). "
+        f"(split: `{manifest.get('split', 'default')}`, total archive rows: `{tot_rows_str}`). "
         f"A deterministic pseudo-random subset of `{manifest.get('selected_sample_count', 'N/A')}` samples was evaluated using RNG seed `{manifest.get('seed', 42)}`.\n"
     )
 
@@ -107,12 +110,23 @@ def generate_master_report(output_dir: str) -> str:
 
     # 4. Models Evaluated
     lines.append("## 4. Pretrained Models & Forensic Baselines\n")
+    if oom_models:
+        lines.append(
+            f"> [!WARNING]\n"
+            f"> **GPU Out-of-Memory (OOM) Exclusions**: The following model(s) were automatically skipped during evaluation due to hardware VRAM exhaustion: `{', '.join(sorted(oom_models))}`.\n"
+        )
     lines.append("| Model Name | Architecture Family | Device | Status | Description |")
     lines.append("| :--- | :--- | :--- | :--- | :--- |")
     for m in models_rep:
-        status_str = "Active" if m.get("load_successful") else f"Unavailable ({m.get('error', 'check checkpoint')})"
+        m_name = m.get("name", "")
+        if m_name in oom_models:
+            status_str = "Skipped (OOM - Out of Memory)"
+        elif m.get("load_successful"):
+            status_str = "Active"
+        else:
+            status_str = f"Unavailable ({m.get('error', 'check checkpoint')})"
         lines.append(
-            f"| **`{m.get('name')}`** | {m.get('family', 'N/A')} | `{m.get('device', 'cpu')}` | {status_str} | {m.get('description', '')} |"
+            f"| **`{m_name}`** | {m.get('family', 'N/A')} | `{m.get('device', 'cpu')}` | {status_str} | {m.get('description', '')} |"
         )
     lines.append("")
 

@@ -2,7 +2,7 @@
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Tests: Pytest](https://img.shields.io/badge/tests-48%20passing-brightgreen.svg)](tests/)
+[![Tests: Pytest](https://img.shields.io/badge/tests-59%20passing-brightgreen.svg)](tests/)
 
 A reproducible, inference-only research codebase designed to study how classical image transformations impact pretrained AI image manipulation localization (IML) models, and how intrinsic image/mask geometric and morphological properties govern localization success and failure.
 
@@ -147,10 +147,20 @@ All deep models support checkpoint loading via `checkpoint_path` or standard cac
 - If `require_checkpoint=False` (default for inference & integration testing), the model automatically initializes its integrated PyTorch architecture with deterministic forensic priors and executes on GPU CUDA or CPU.
 - If `require_checkpoint=True`, the model gracefully reports `is_available() -> False` without failing ungracefully.
 
-### Existing Model Detection & Skipping
-To save compute and resume experiments seamlessly without re-running completed models:
-- **Default Behavior (`skip_existing_models: true`)**: Enabled by default in `ModelConfig`. Any model that has already completed all sample and transformation evaluations in the output directory is automatically detected and skipped before initialization, conserving GPU VRAM and compute time.
-- **CLI Flags**: The CLI defaults to skipping completed models (`--skip-existing-models`). To force re-evaluation of all models, specify `--no-skip-existing-models`.
+### Existing Model & OOM Skipping
+To conserve compute, prevent crashes on GPU VRAM limits, and resume experiments seamlessly:
+- **Default Completed Model Skipping (`skip_existing_models: true`)**: Any model that has already completed all sample and transformation evaluations in the output directory is automatically detected and skipped before initialization.
+- **Default OOM Model Skipping (`skip_oom_models: true`)**: Enabled by default in `ModelConfig`. When any model encounters a CUDA or system Out-of-Memory (`torch.cuda.OutOfMemoryError` or `MemoryError`), the runner immediately:
+  1. Catches the memory exhaustion gracefully.
+  2. Clears GPU VRAM via `torch.cuda.empty_cache()` and garbage collection.
+  3. Evicts the failing model from active memory, skipping it for all remaining transformations on the current sample and all subsequent samples.
+  4. Persists the OOM status to `oom_models.json` in the results directory.
+  5. On subsequent runs or experiment resumptions, previously OOM-exhausted models are automatically skipped before initialization.
+- **Explicit Model Skipping (`skip_models: [...]`)**: Manually specify model names to skip directly via YAML configuration or CLI flags.
+- **CLI Flags**:
+  - `--skip-existing-models` / `--no-skip-existing-models` (default: skip completed)
+  - `--skip-oom-models` / `--no-skip-oom-models` (default: skip models that OOM)
+  - `--skip-models model1 model2 ...` (explicitly skip specified models)
 - **Baseline Metric Caching**: When resuming, existing baseline (identity) evaluations are loaded directly from the ledger rather than recomputed via neural forward passes.
 
 Inspect registered models:

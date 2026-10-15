@@ -69,6 +69,8 @@ class ModelConfig:
     inference_resolution: Optional[List[int]] = None  # None: keep native image resolution
     model_kwargs: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     skip_existing_models: bool = True
+    skip_oom_models: bool = True
+    skip_models: List[str] = field(default_factory=list)
 
 
 @dataclass

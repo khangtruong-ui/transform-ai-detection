@@ -38,6 +38,10 @@ def cmd_run(args: argparse.Namespace) -> None:
         config.output.output_dir = args.output_dir
     if getattr(args, "skip_existing_models", None) is not None:
         config.models.skip_existing_models = args.skip_existing_models
+    if getattr(args, "skip_oom_models", None) is not None:
+        config.models.skip_oom_models = args.skip_oom_models
+    if getattr(args, "skip_models", None):
+        config.models.skip_models = list(dict.fromkeys(config.models.skip_models + args.skip_models))
 
     runner = ExperimentRunner(config)
     summary = runner.run()
@@ -161,6 +165,25 @@ def main() -> None:
         dest="skip_existing_models",
         action="store_false",
         help="Force re-evaluation of models even if existing evaluations are present in results directory",
+    )
+    p_run.add_argument(
+        "--skip-oom-models",
+        dest="skip_oom_models",
+        action="store_true",
+        default=True,
+        help="Detect and skip models that encounter CUDA/system OutOfMemory errors (default: True)",
+    )
+    p_run.add_argument(
+        "--no-skip-oom-models",
+        dest="skip_oom_models",
+        action="store_false",
+        help="Disable skipping of models that encounter OutOfMemory errors (will retry on subsequent samples)",
+    )
+    p_run.add_argument(
+        "--skip-models",
+        nargs="+",
+        default=None,
+        help="Explicit list of model names to skip from evaluation (e.g. --skip-models trufor sparsevit)",
     )
     p_run.set_defaults(func=cmd_run)
 

@@ -35,12 +35,22 @@ class ExperimentSummaryGenerator:
         output_dir: str,
         n_bootstraps: int = 1000,
         ci: float = 0.95,
+        oom_models: Optional[List[str]] = None,
     ) -> None:
         self.metrics_csv_path = metrics_csv_path
         self.diagnostics_csv_path = diagnostics_csv_path
         self.output_dir = output_dir
         self.n_bootstraps = n_bootstraps
         self.ci = ci
+        self.oom_models = list(oom_models or [])
+        if not self.oom_models and os.path.exists(os.path.join(output_dir, "oom_models.json")):
+            try:
+                with open(os.path.join(output_dir, "oom_models.json"), "r", encoding="utf-8") as f:
+                    loaded = json.load(f)
+                    if isinstance(loaded, list):
+                        self.oom_models = loaded
+            except Exception:
+                pass
 
     def generate(self) -> Dict[str, Any]:
         """Generate all aggregate statistical tables and save to disk."""
@@ -221,8 +231,9 @@ class ExperimentSummaryGenerator:
         run_summary = {
             "total_evaluations": len(merged_df),
             "unique_samples": int(merged_df["sample_id"].nunique()),
-            "models_evaluated": sorted(merged_df["model"].unique().tolist()),
-            "transformations_evaluated": sorted(merged_df["transform_name"].unique().tolist()),
+            "models_evaluated": sorted(merged_df["model"].unique().tolist()) if "model" in merged_df.columns else [],
+            "oom_models_skipped": self.oom_models,
+            "transformations_evaluated": sorted(merged_df["transform_name"].unique().tolist()) if "transform_name" in merged_df.columns else [],
             "overall_failure_rate": float(merged_df["is_failure"].mean()) if "is_failure" in merged_df.columns else 0.0,
             "failure_analysis_summary": {
                 "all_models_failed_rate": failure_analysis.get("all_models_failed_rate"),
@@ -236,7 +247,7 @@ class ExperimentSummaryGenerator:
                 "failure_analysis.json",
                 "stratification_by_method.csv",
                 "stratification_by_mask_area.csv",
-            ],
+            ] + (["oom_models.json"] if self.oom_models else []),
         }
 
         with open(os.path.join(self.output_dir, "run_summary.json"), "w", encoding="utf-8") as f:

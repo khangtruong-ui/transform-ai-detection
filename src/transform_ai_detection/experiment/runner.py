@@ -52,6 +52,14 @@ from transform_ai_detection.experiment.master_report import generate_master_repo
 logger = logging.getLogger(__name__)
 
 
+def is_oom_exception(exc: BaseException) -> bool:
+    """Determine whether an exception is caused by CUDA or system out-of-memory."""
+    if isinstance(exc, (torch.cuda.OutOfMemoryError, MemoryError)):
+        return True
+    msg = str(exc).lower()
+    return "out of memory" in msg or "cuda out of memory" in msg or "cuda error: out of memory" in msg
+
+
 class ExperimentRunner:
     """Executes deterministic, paired, inference-only robustness experiments."""
 
@@ -69,8 +77,24 @@ class ExperimentRunner:
         # 1. Setup persistent files
         self.metrics_csv = os.path.join(self.output_dir, "metrics_per_image.csv")
         self.diagnostics_csv = os.path.join(self.output_dir, "diagnostics_per_image.csv")
+        self.oom_models_path = os.path.join(self.output_dir, "oom_models.json")
         self.ledger = ExperimentLedger(self.metrics_csv, self.diagnostics_csv)
         self.validator = DatasetValidator()
+
+        # Load previously recorded OOM models
+        self.oom_models: Set[str] = set()
+        if os.path.exists(self.oom_models_path):
+            try:
+                with open(self.oom_models_path, "r", encoding="utf-8") as f:
+                    loaded = json.load(f)
+                    if isinstance(loaded, list):
+                        self.oom_models.update(loaded)
+                    elif isinstance(loaded, dict) and "oom_models" in loaded:
+                        self.oom_models.update(loaded["oom_models"])
+                if self.oom_models:
+                    logger.info(f"Loaded previously recorded OOM models to skip: {sorted(list(self.oom_models))}")
+            except Exception as e:
+                logger.warning(f"Could not read {self.oom_models_path}: {e}")
 
         # 2. Setup evaluation tools
         self.eval_engine = EvaluationEngine(
@@ -84,6 +108,50 @@ class ExperimentRunner:
         )
 
         self.errors_log: List[Dict[str, Any]] = []
+
+    def _record_oom_model(
+        self,
+        model_name: str,
+        stage: str,
+        sample_id: Optional[str] = None,
+        transform: Optional[str] = None,
+        error: Optional[Exception] = None,
+    ) -> None:
+        """Mark model as OOM, record in errors log, and persist immediately to oom_models.json."""
+        self.oom_models.add(model_name)
+        err_entry = {
+            "stage": stage,
+            "model": model_name,
+            "error": str(error) if error is not None else "OutOfMemoryError",
+        }
+        if sample_id is not None:
+            err_entry["sample_id"] = sample_id
+        if transform is not None:
+            err_entry["transform"] = transform
+        self.errors_log.append(err_entry)
+
+        try:
+            with open(self.oom_models_path, "w", encoding="utf-8") as f:
+                json.dump(sorted(list(self.oom_models)), f, indent=2)
+        except Exception as e:
+            logger.warning(f"Failed to write {self.oom_models_path}: {e}")
+
+    def _evict_oom_model(self, model_name: str, models: Dict[str, BaseLocalizationModel]) -> None:
+        """Evict model from active dictionary and release GPU VRAM."""
+        if model_name in models:
+            try:
+                del models[model_name]
+            except Exception:
+                pass
+        import gc
+        gc.collect()
+        if torch.cuda.is_available():
+            try:
+                torch.cuda.empty_cache()
+                if hasattr(torch.cuda, "ipc_collect"):
+                    torch.cuda.ipc_collect()
+            except Exception:
+                pass
 
     def _init_environment_and_manifest(self, dataset: BaseDatasetAdapter, sample_indices: List[int]) -> None:
         """Persist environment, configs, dataset manifest, and model/transform metadata."""
@@ -200,10 +268,14 @@ class ExperimentRunner:
 
         transform_keys = [(t.get_metadata().name, t.get_metadata().severity_label) for t in transformations]
         skip_existing = getattr(self.config.models, "skip_existing_models", True)
+        skip_oom = getattr(self.config.models, "skip_oom_models", True)
+        skip_models_set = set(getattr(self.config.models, "skip_models", []) or [])
 
         existing_models = self.ledger.get_completed_models()
         if existing_models:
             logger.info(f"Discovered existing models in ledger: {sorted(list(existing_models))}")
+        if self.oom_models:
+            logger.info(f"Discovered previously OOM-skipped models: {sorted(list(self.oom_models))}")
 
         # Only fetch sample IDs upfront if the dataset supports instant / non-network access
         sample_ids_str: Optional[List[str]] = None
@@ -214,6 +286,16 @@ class ExperimentRunner:
         models: Dict[str, BaseLocalizationModel] = {}
         target_device = self.config.models.device
         for m_name in self.config.models.models:
+            if m_name in skip_models_set:
+                logger.info(f"Model '{m_name}' is in configured skip_models. Skipping model initialization.")
+                continue
+
+            if skip_oom and m_name in self.oom_models:
+                logger.warning(
+                    f"Model '{m_name}' previously encountered OutOfMemoryError in {self.output_dir}. Skipping model initialization."
+                )
+                continue
+
             if skip_existing and self.ledger.is_model_fully_completed(
                 m_name,
                 sample_ids=sample_ids_str,
@@ -233,8 +315,15 @@ class ExperimentRunner:
                 else:
                     logger.warning(f"Model {m_name} reported unavailable; skipping.")
             except Exception as e:
-                logger.error(f"Failed to instantiate model {m_name}: {e}")
-                self.errors_log.append({"stage": "model_init", "model": m_name, "error": str(e)})
+                if is_oom_exception(e):
+                    logger.error(f"OOM during instantiation of model {m_name}: {e}")
+                    if skip_oom:
+                        self._record_oom_model(m_name, stage="model_init_oom", error=e)
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+                else:
+                    logger.error(f"Failed to instantiate model {m_name}: {e}")
+                    self.errors_log.append({"stage": "model_init", "model": m_name, "error": str(e)})
 
         logger.info(
             f"Active models: {list(models.keys())} | "
@@ -244,12 +333,15 @@ class ExperimentRunner:
 
         active_indices = sample_indices if models else []
         if not models:
-            logger.info("All configured models are already fully evaluated in the ledger. Skipping evaluation loop.")
+            logger.info("All configured models are already fully evaluated or skipped (e.g. completed or OOM). Skipping evaluation loop.")
 
         # Main evaluation loop over samples
         pbar = tqdm(active_indices, desc="Evaluating samples", dynamic_ncols=True)
         for idx in pbar:
-            pbar.set_postfix(sample_idx=idx, refresh=False)
+            if not models:
+                logger.warning("No active models remaining (all completed or skipped due to OOM). Terminating evaluation loop.")
+                break
+            pbar.set_postfix(sample_idx=idx, active_models=len(models), refresh=False)
             try:
                 sample: DatasetSample = dataset[idx]
             except Exception as e:
@@ -282,7 +374,11 @@ class ExperimentRunner:
 
             # Step A: Evaluate baseline (Identity) for each model
             baseline_metrics: Dict[str, Dict[str, Any]] = {}
-            for m_name, model in models.items():
+            for m_name in list(models.keys()):
+                if m_name not in models:
+                    continue
+                model = models[m_name]
+
                 if self.ledger.is_completed(sample.sample_id, m_name, "identity", "original"):
                     cached_base = self.ledger.get_baseline_metrics(sample.sample_id, m_name)
                     if cached_base is not None:
@@ -335,24 +431,37 @@ class ExperimentRunner:
                     self.ledger.record_metric_row(base_row)
                     baseline_metrics[m_name] = metrics
 
-                except (torch.cuda.OutOfMemoryError, MemoryError) as oom:
-                    logger.warning(f"OOM on sample {sample.sample_id}, model {m_name}: {oom}")
-                    if torch.cuda.is_available():
-                        torch.cuda.empty_cache()
-                    self.errors_log.append({
-                        "stage": "inference_baseline_oom",
-                        "sample_id": sample.sample_id,
-                        "model": m_name,
-                        "error": str(oom),
-                    })
                 except Exception as e:
-                    logger.warning(f"Error on sample {sample.sample_id}, model {m_name}: {e}")
-                    self.errors_log.append({
-                        "stage": "inference_baseline_error",
-                        "sample_id": sample.sample_id,
-                        "model": m_name,
-                        "error": str(e),
-                    })
+                    if is_oom_exception(e):
+                        logger.warning(
+                            f"OOM on sample {sample.sample_id}, model {m_name}: {e}."
+                            + (" Skipping model for all subsequent evaluations." if skip_oom else "")
+                        )
+                        if skip_oom:
+                            self._record_oom_model(
+                                m_name,
+                                stage="inference_baseline_oom",
+                                sample_id=sample.sample_id,
+                                error=e,
+                            )
+                            self._evict_oom_model(m_name, models)
+                        else:
+                            if torch.cuda.is_available():
+                                torch.cuda.empty_cache()
+                            self.errors_log.append({
+                                "stage": "inference_baseline_oom",
+                                "sample_id": sample.sample_id,
+                                "model": m_name,
+                                "error": str(e),
+                            })
+                    else:
+                        logger.warning(f"Error on sample {sample.sample_id}, model {m_name}: {e}")
+                        self.errors_log.append({
+                            "stage": "inference_baseline_error",
+                            "sample_id": sample.sample_id,
+                            "model": m_name,
+                            "error": str(e),
+                        })
 
             # Step B: Evaluate all transformations under paired condition
             for transform in transformations:
@@ -380,7 +489,11 @@ class ExperimentRunner:
                     continue
 
                 # Evaluate models on transformed image
-                for m_name, model in models.items():
+                for m_name in list(models.keys()):
+                    if m_name not in models:
+                        continue
+                    model = models[m_name]
+
                     if self.ledger.is_completed(
                         sample.sample_id, m_name, t_meta.name, t_meta.severity_label
                     ):
@@ -429,30 +542,42 @@ class ExperimentRunner:
                         }
                         self.ledger.record_metric_row(row)
 
-                    except (torch.cuda.OutOfMemoryError, MemoryError) as oom:
-                        logger.warning(
-                            f"OOM on {sample.sample_id}, model {m_name}, transform {t_meta.name}: {oom}"
-                        )
-                        if torch.cuda.is_available():
-                            torch.cuda.empty_cache()
-                        self.errors_log.append({
-                            "stage": "inference_transform_oom",
-                            "sample_id": sample.sample_id,
-                            "model": m_name,
-                            "transform": t_meta.name,
-                            "error": str(oom),
-                        })
                     except Exception as e:
-                        logger.warning(
-                            f"Error on {sample.sample_id}, model {m_name}, transform {t_meta.name}: {e}"
-                        )
-                        self.errors_log.append({
-                            "stage": "inference_transform_error",
-                            "sample_id": sample.sample_id,
-                            "model": m_name,
-                            "transform": t_meta.name,
-                            "error": str(e),
-                        })
+                        if is_oom_exception(e):
+                            logger.warning(
+                                f"OOM on {sample.sample_id}, model {m_name}, transform {t_meta.name}: {e}."
+                                + (" Skipping model for all subsequent evaluations." if skip_oom else "")
+                            )
+                            if skip_oom:
+                                self._record_oom_model(
+                                    m_name,
+                                    stage="inference_transform_oom",
+                                    sample_id=sample.sample_id,
+                                    transform=t_meta.name,
+                                    error=e,
+                                )
+                                self._evict_oom_model(m_name, models)
+                            else:
+                                if torch.cuda.is_available():
+                                    torch.cuda.empty_cache()
+                                self.errors_log.append({
+                                    "stage": "inference_transform_oom",
+                                    "sample_id": sample.sample_id,
+                                    "model": m_name,
+                                    "transform": t_meta.name,
+                                    "error": str(e),
+                                })
+                        else:
+                            logger.warning(
+                                f"Error on {sample.sample_id}, model {m_name}, transform {t_meta.name}: {e}"
+                            )
+                            self.errors_log.append({
+                                "stage": "inference_transform_error",
+                                "sample_id": sample.sample_id,
+                                "model": m_name,
+                                "transform": t_meta.name,
+                                "error": str(e),
+                            })
 
         # Save exclusion logger report and errors
         self.validator.exclusion_logger.export_json(
@@ -460,6 +585,11 @@ class ExperimentRunner:
         )
         with open(os.path.join(self.output_dir, "errors_and_skipped.json"), "w", encoding="utf-8") as f:
             json.dump(self.errors_log, f, indent=2)
+
+        # Always persist oom_models.json if any OOM models exist
+        if self.oom_models:
+            with open(self.oom_models_path, "w", encoding="utf-8") as f:
+                json.dump(sorted(list(self.oom_models)), f, indent=2)
 
         # Generate final aggregate metrics, stats, and run summary
         logger.info("Computing aggregate metrics, bootstrap CIs, and statistical tests...")
@@ -469,10 +599,12 @@ class ExperimentRunner:
             output_dir=self.output_dir,
             n_bootstraps=self.config.evaluation.bootstrap_iterations,
             ci=self.config.evaluation.bootstrap_ci,
+            oom_models=sorted(list(self.oom_models)),
         )
         summary = summary_gen.generate()
         summary["duration_seconds"] = round(time.time() - start_time, 2)
         summary["total_evaluations_completed"] = self.ledger.completed_count
+        summary["oom_models"] = sorted(list(self.oom_models))
 
         # Generate Master Markdown Research Report
         logger.info("Generating master research report in Markdown...")
