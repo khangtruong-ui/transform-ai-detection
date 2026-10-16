@@ -1,0 +1,48 @@
+{
+  "total_evaluations": 17052,
+  "unique_samples": 90,
+  "models_evaluated": [
+    "code",
+    "dct_inconsistency_detector",
+    "deep_forensic_detector",
+    "ela_detector",
+    "iml_vit",
+    "maskclip",
+    "noise_residual_detector",
+    "pscc_net",
+    "rita",
+    "sida",
+    "sparsevit",
+    "trufor"
+  ],
+  "oom_models_skipped": [
+    "iml_vit",
+    "pscc_net",
+    "sparsevit",
+    "trufor"
+  ],
+  "transformations_evaluated": [
+    "brightness_contrast",
+    "downscale_upscale",
+    "gaussian_blur",
+    "gaussian_noise",
+    "identity",
+    "jpeg_compression",
+    "sharpening"
+  ],
+  "overall_failure_rate": 0.9641097818437719,
+  "failure_analysis_summary": {
+    "all_models_failed_rate": 0.9979296066252588,
+    "model_specific_failure_count": 0
+  },
+  "artifacts_generated": [
+    "aggregate_metrics.csv",
+    "aggregate_metrics.json",
+    "statistical_tests.json",
+    "correlations.csv",
+    "failure_analysis.json",
+    "stratification_by_method.csv",
+    "stratification_by_mask_area.csv",
+    "oom_models.json"
+  ]
+}

@@ -1,0 +1,98 @@
+name: iml_full_robustness_study
+description: Comprehensive paired transformation robustness and failure analysis study
+dataset:
+  name: KhangTruong/Tampered-Images-Combined-Dataset
+  adapter: tampered_combined
+  split: cross_test
+  max_samples: 100
+  sample_indices: null
+  seed: 42
+  streaming: true
+  max_cached_row_groups: 2
+  filter_methods: null
+  filter_datasets: null
+  cache_dir: null
+  local_data_dir: null
+transformations:
+  enabled_transforms:
+  - identity
+  - jpeg_compression
+  - gaussian_blur
+  - downscale_upscale
+  - brightness_contrast
+  - gaussian_noise
+  - sharpening
+  severities:
+    jpeg_compression:
+    - 95
+    - 75
+    - 50
+    - 25
+    gaussian_blur:
+    - 1.0
+    - 2.0
+    - 3.0
+    - 5.0
+    downscale_upscale:
+    - 0.75
+    - 0.5
+    - 0.25
+    brightness_contrast:
+    - factor_brightness: 1.2
+      factor_contrast: 1.2
+    - factor_brightness: 0.8
+      factor_contrast: 0.8
+    - factor_brightness: 1.5
+      factor_contrast: 1.5
+    gaussian_noise:
+    - 0.01
+    - 0.03
+    - 0.05
+    sharpening:
+    - 1.5
+    - 2.0
+    - 3.0
+  seed: 42
+  include_geometric: false
+  crop_size: null
+models:
+  models:
+  - ela_detector
+  - noise_residual_detector
+  - dct_inconsistency_detector
+  - deep_forensic_detector
+  - trufor
+  - sparsevit
+  - iml_vit
+  - pscc_net
+  - code
+  - maskclip
+  - sida
+  - rita
+  device: auto
+  batch_size: 1
+  inference_resolution: null
+  model_kwargs: {}
+  skip_existing_models: true
+  skip_oom_models: true
+  skip_models: []
+evaluation:
+  threshold_policy: fixed_0.5
+  fixed_threshold: 0.5
+  boundary_tolerance: 3
+  compute_ranking_metrics: true
+  bootstrap_iterations: 1000
+  bootstrap_ci: 0.95
+  failure_metric: iou
+  failure_threshold: 0.3
+  degradation_failure_delta: -0.2
+  run_semantic_boundary_diagnostic: true
+output:
+  output_dir: results/full_study
+  save_predictions: false
+  save_visualizations: true
+  save_per_image_diagnostics: true
+  plot_dpi: 300
+  export_formats:
+  - png
+  - pdf

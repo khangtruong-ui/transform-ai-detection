@@ -1,0 +1,194 @@
+[
+  {
+    "name": "ela_detector",
+    "family": "forensic_compression_analysis",
+    "device": "cuda:0",
+    "parameters": {
+      "recompress_quality": 90,
+      "threshold": 0.5,
+      "smoothing_sigma": 2.0
+    },
+    "description": "Error Level Analysis: detects JPEG recompression artifact discrepancies.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "noise_residual_detector",
+    "family": "noise_inconsistency",
+    "device": "cuda:0",
+    "parameters": {
+      "threshold": 0.5,
+      "window_size": 15,
+      "filter_type": "laplacian"
+    },
+    "description": "High-pass spatial noise residual variance inconsistency detector.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "dct_inconsistency_detector",
+    "family": "frequency_domain",
+    "device": "cuda:0",
+    "parameters": {
+      "threshold": 0.5
+    },
+    "description": "Local 8x8 block boundary discontinuity and energy inconsistency.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "deep_forensic_detector",
+    "family": "deep_constrained_cnn",
+    "device": "cuda:0",
+    "parameters": {
+      "threshold": 0.5,
+      "architecture": "BayarConv2d + MultiScaleResNet"
+    },
+    "description": "Deep PyTorch neural network with adaptive Bayar constrained residual convolutions.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "trufor",
+    "family": "deep_cross_modal_transformer",
+    "available": true,
+    "checkpoint_path": null,
+    "device": "cuda:0",
+    "load_error": null,
+    "parameters": {
+      "threshold": 0.5,
+      "streams": [
+        "rgb",
+        "noiseprint++"
+      ],
+      "fusion": "cross_modal_attention"
+    },
+    "paper_reference": "Guillaro et al. (CVPR 2023) TruFor: leveraging all-round clues for trustworthy image forgery detection and localization",
+    "description": "TruFor: RGB and Noiseprint++ Cross-Modal Transformer for Manipulation Localization.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "sparsevit",
+    "family": "sparse_coding_vision_transformer",
+    "device": "cuda:0",
+    "available": true,
+    "checkpoint_path": null,
+    "load_error": null,
+    "parameters": {
+      "threshold": 0.5,
+      "embed_dim": 64,
+      "patch_size": 8,
+      "sparsity_ratio": 0.5
+    },
+    "paper_reference": "Su et al. (AAAI 2025) Can we get rid of handcrafted feature extractors? SparseViT",
+    "description": "SparseViT: Non-semantics-centered sparse coding transformer for manipulation localization.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "iml_vit",
+    "family": "hierarchical_vision_transformer",
+    "device": "cuda:0",
+    "available": true,
+    "checkpoint_path": null,
+    "load_error": null,
+    "parameters": {
+      "threshold": 0.5,
+      "stages": [
+        32,
+        64,
+        128
+      ],
+      "decoder": "progressive_aggregation"
+    },
+    "paper_reference": "Ma et al. (AAAI 2024) IML-ViT: benchmarking image manipulation localization by vision transformer",
+    "description": "IML-ViT: Hierarchical vision transformer benchmarking architecture with progressive feature aggregation.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "pscc_net",
+    "family": "progressive_spatio_channel_correlation_cnn",
+    "device": "cuda:0",
+    "available": true,
+    "checkpoint_path": null,
+    "load_error": null,
+    "parameters": {
+      "threshold": 0.5,
+      "correlation": "spatial + channel",
+      "stages": 3
+    },
+    "paper_reference": "Liu et al. (IEEE TCSVT 2022) PSCC-Net: progressive spatio-channel correlation network",
+    "description": "PSCC-Net: Progressive spatio-channel correlation network for manipulation localization.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "code",
+    "family": "reinforcement_learning_decision_environment",
+    "device": "cuda:0",
+    "available": true,
+    "checkpoint_path": null,
+    "load_error": null,
+    "parameters": {
+      "threshold": 0.5,
+      "actions": "continuous_and_discrete"
+    },
+    "paper_reference": "Peng et al. (IEEE TIFS 2024) Employing reinforcement learning to construct a decision-making environment for image forgery localization",
+    "description": "CoDE: Continuous and discrete decision-making environment for tampering localization.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "maskclip",
+    "family": "dense_clip_feature_fusion",
+    "device": "cuda:0",
+    "available": true,
+    "checkpoint_path": null,
+    "load_error": null,
+    "parameters": {
+      "threshold": 0.5,
+      "embed_dim": 64,
+      "classifier": "1x1_dense_conv"
+    },
+    "paper_reference": "Wang et al. (CVPR 2025) OpenSDI: spotting diffusion-generated images in the open world",
+    "description": "MaskCLIP: Pretrained vision-model dense feature fusion for manipulation localization.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "sida",
+    "family": "multimodal_forensic_prompt_queries",
+    "device": "cuda:0",
+    "available": true,
+    "checkpoint_path": null,
+    "load_error": null,
+    "parameters": {
+      "threshold": 0.5,
+      "forensic_queries": 4,
+      "embed_dim": 64
+    },
+    "paper_reference": "Huang et al. (CVPR 2025) SIDA: social media image deepfake detection, localization and explanation",
+    "description": "SIDA: Social media image deepfake detection, localization and explanation architecture.",
+    "registered": true,
+    "load_successful": true
+  },
+  {
+    "name": "rita",
+    "family": "process_aware_autoregressive_transformer",
+    "device": "cuda:0",
+    "available": true,
+    "checkpoint_path": null,
+    "load_error": null,
+    "parameters": {
+      "threshold": 0.5,
+      "autoregressive_blocks": 2,
+      "embed_dim": 64
+    },
+    "paper_reference": "Zhu et al. (CVPR Findings 2026) Revisiting image manipulation localization under realistic manipulation scenarios",
+    "description": "RITA: Process-aware autoregressive localizer for realistic manipulation scenarios.",
+    "registered": true,
+    "load_successful": true
+  }
+]

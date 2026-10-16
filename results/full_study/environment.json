@@ -1,0 +1,33 @@
+{
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
+  "python_version": "3.12.14",
+  "cpu": {
+    "processor": "x86_64",
+    "cpu_count_logical": 80,
+    "cpu_count_physical": 40
+  },
+  "memory": {
+    "total_bytes": 202672250880,
+    "total_gb": 188.75,
+    "available_bytes": 159718948864,
+    "available_gb": 148.75
+  },
+  "disk": {
+    "total_gb": 48.0,
+    "free_gb": 47.22
+  },
+  "pytorch": {
+    "version": "2.11.0+cu128",
+    "cuda_available": true,
+    "gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 3060",
+        "total_memory_gb": 11.63,
+        "major": 8,
+        "minor": 6,
+        "multi_processor_count": 28
+      }
+    ]
+  }
+}

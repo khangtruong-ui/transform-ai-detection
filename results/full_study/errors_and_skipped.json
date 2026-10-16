@@ -1,0 +1,26 @@
+[
+  {
+    "stage": "inference_baseline_oom",
+    "model": "trufor",
+    "error": "CUDA out of memory. Tried to allocate 7.14 GiB. GPU 0 has a total capacity of 11.63 GiB of which 4.25 GiB is free. Including non-PyTorch memory, this process has 7.37 GiB memory in use. Of the allocated memory 7.21 GiB is allocated by PyTorch, and 19.86 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)",
+    "sample_id": "opensdid_Flux.1_000228930.jpg"
+  },
+  {
+    "stage": "inference_baseline_oom",
+    "model": "sparsevit",
+    "error": "CUDA out of memory. Tried to allocate 2.71 GiB. GPU 0 has a total capacity of 11.63 GiB of which 2.40 GiB is free. Including non-PyTorch memory, this process has 9.23 GiB memory in use. Of the allocated memory 9.08 GiB is allocated by PyTorch, and 18.88 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)",
+    "sample_id": "opensdid_Flux.1_000228930.jpg"
+  },
+  {
+    "stage": "inference_baseline_oom",
+    "model": "iml_vit",
+    "error": "CUDA out of memory. Tried to allocate 14.45 GiB. GPU 0 has a total capacity of 11.63 GiB of which 9.62 GiB is free. Including non-PyTorch memory, this process has 2.00 GiB memory in use. Of the allocated memory 55.95 MiB is allocated by PyTorch, and 1.81 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)",
+    "sample_id": "opensdid_Flux.1_000228930.jpg"
+  },
+  {
+    "stage": "inference_baseline_oom",
+    "model": "pscc_net",
+    "error": "CUDA out of memory. Tried to allocate 7.22 GiB. GPU 0 has a total capacity of 11.63 GiB of which 4.16 GiB is free. Including non-PyTorch memory, this process has 7.46 GiB memory in use. Of the allocated memory 7.28 GiB is allocated by PyTorch, and 51.15 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)",
+    "sample_id": "opensdid_Flux.1_000228930.jpg"
+  }
+]
