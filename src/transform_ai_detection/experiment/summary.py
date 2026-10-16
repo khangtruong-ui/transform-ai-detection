@@ -21,6 +21,7 @@ from transform_ai_detection.failure_analysis.stratification import (
     bin_resolution,
     stratify_performance,
 )
+from transform_ai_detection.models.registry import ModelRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -106,6 +107,7 @@ class ExperimentSummaryGenerator:
             model, t_name, sev_label = group_keys
             rec: Dict[str, Any] = {
                 "model": model,
+                "model_category": ModelRegistry.get_model_category(model),
                 "transform_name": t_name,
                 "severity_label": sev_label,
                 "n_samples": len(group),
@@ -148,6 +150,7 @@ class ExperimentSummaryGenerator:
                     stat_res = run_paired_significance_test(b_iou, t_iou)
                     stat_res.update({
                         "model": model,
+                        "model_category": ModelRegistry.get_model_category(model),
                         "transform_name": t_name,
                         "severity_label": sev_label,
                         "metric": "iou",
@@ -200,6 +203,7 @@ class ExperimentSummaryGenerator:
 
                         corr_records.append({
                             "model": model,
+                            "model_category": ModelRegistry.get_model_category(model),
                             "transform_name": t_name,
                             "diagnostic_feature": feat,
                             "pearson_r": bivar.get("pearson_r"),

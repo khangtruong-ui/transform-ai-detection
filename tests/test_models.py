@@ -263,3 +263,19 @@ def test_require_checkpoint_flag():
     assert not model.is_available()
     with pytest.raises(RuntimeError):
         model.predict(None)
+
+
+def test_model_categories():
+    assert "ela_detector" in ModelRegistry.list_classical_models()
+    assert "trufor" in ModelRegistry.list_integrated_paper_models()
+    assert ModelRegistry.get_model_category("ela_detector") == "Classical Models"
+    assert ModelRegistry.get_model_category("noise_residual_detector") == "Classical Models"
+    assert ModelRegistry.get_model_category("code") == "Integrated Models"
+    assert ModelRegistry.get_model_category("trufor") == "Integrated Models"
+    assert ModelRegistry.is_classical_model("ela_detector")
+    assert ModelRegistry.is_integrated_model("code")
+
+    report = ModelRegistry.generate_availability_report(["ela_detector", "code"], default_device="cpu")
+    assert report[0]["category"] == "Classical Models"
+    assert report[1]["category"] == "Integrated Models"
+

@@ -78,6 +78,33 @@ class ModelRegistry:
         return ["sparsevit", "iml_vit", "pscc_net", "trufor", "code", "maskclip", "sida", "rita"]
 
     @classmethod
+    def list_classical_models(cls) -> List[str]:
+        return [
+            "ela_detector",
+            "noise_residual_detector",
+            "dct_inconsistency_detector",
+            "deep_forensic_detector",
+        ]
+
+    @classmethod
+    def get_model_category(cls, name: str) -> str:
+        """Classify a model name into 'Classical Models' or 'Integrated Models'."""
+        clean_name = name.lower().replace("-", "_")
+        integrated = {m.lower().replace("-", "_") for m in cls.list_integrated_paper_models()}
+        integrated.update({"sparse_vit", "iml_vit", "pscc_net", "pscc", "mask_clip"})
+        if clean_name in integrated:
+            return "Integrated Models"
+        return "Classical Models"
+
+    @classmethod
+    def is_integrated_model(cls, name: str) -> bool:
+        return cls.get_model_category(name) == "Integrated Models"
+
+    @classmethod
+    def is_classical_model(cls, name: str) -> bool:
+        return cls.get_model_category(name) == "Classical Models"
+
+    @classmethod
     def generate_availability_report(
         cls,
         model_names: List[str],
@@ -93,12 +120,14 @@ class ModelRegistry:
             try:
                 model = cls.create(name, **kw)
                 info = model.get_model_info()
+                info["category"] = cls.get_model_category(name)
                 info["registered"] = True
                 info["load_successful"] = model.is_available()
                 report.append(info)
             except Exception as e:
                 report.append({
                     "name": name,
+                    "category": cls.get_model_category(name),
                     "registered": name in cls._factories,
                     "load_successful": False,
                     "error": str(e),

@@ -1,7 +1,7 @@
 # Master Research Report: Transformation Robustness and Failure Analysis for AI Image Manipulation Localization
 
 > **Experiment Run**: `360 total evaluations completed`
-> **Generated Artifacts Directory**: `/workspace/transform-ai-detection/results/gpu_study`
+> **Generated Artifacts Directory**: `/root/transform-ai-detection/results/gpu_study`
 
 ## 1. Executive Summary
 
@@ -36,6 +36,8 @@ The `DatasetValidator` identified anomalous dataset instances prior to inference
 
 ## 4. Pretrained Models & Forensic Baselines
 
+### Classical Models (Forensic Baselines)
+
 | Model Name | Architecture Family | Device | Status | Description |
 | :--- | :--- | :--- | :--- | :--- |
 | **`ela_detector`** | forensic_compression_analysis | `cuda:0` | Active | Error Level Analysis: detects JPEG recompression artifact discrepancies. |
@@ -64,55 +66,53 @@ Localization performance was quantified using pixel-level Intersection over Unio
 
 ### Aggregate Performance by Transformation Condition
 
+#### Classical Models
+
 | Model | Transformation | Severity | N | Mean IoU [95% CI] | Mean F1 [95% CI] | Mean Delta IoU | Failure Rate |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `dct_inconsistency_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | 0.045 [0.005, 0.109] | 0.075 [0.010, 0.174] | -0.000 | 100.0% |
-| `dct_inconsistency_detector` | `brightness_contrast` | `B=1.2_C=1.2` | 9 | 0.038 [0.004, 0.087] | 0.066 [0.008, 0.147] | -0.007 | 100.0% |
-| `dct_inconsistency_detector` | `downscale_upscale` | `scale=0.50` | 9 | 0.051 [0.004, 0.109] | 0.088 [0.009, 0.182] | +0.006 | 100.0% |
-| `dct_inconsistency_detector` | `downscale_upscale` | `scale=0.75` | 9 | 0.051 [0.005, 0.115] | 0.086 [0.009, 0.186] | +0.006 | 100.0% |
-| `dct_inconsistency_detector` | `gaussian_blur` | `sigma=1.0` | 9 | 0.048 [0.004, 0.099] | 0.084 [0.008, 0.169] | +0.003 | 100.0% |
-| `dct_inconsistency_detector` | `gaussian_blur` | `sigma=2.0` | 9 | 0.039 [0.003, 0.084] | 0.068 [0.007, 0.144] | -0.006 | 100.0% |
 | `dct_inconsistency_detector` | `identity` | `original` | 9 | 0.045 [0.005, 0.109] | 0.075 [0.010, 0.175] | +0.000 | 100.0% |
-| `dct_inconsistency_detector` | `jpeg_compression` | `Q=50` | 9 | 0.047 [0.005, 0.111] | 0.078 [0.009, 0.179] | +0.002 | 100.0% |
-| `dct_inconsistency_detector` | `jpeg_compression` | `Q=75` | 9 | 0.044 [0.004, 0.107] | 0.074 [0.008, 0.173] | -0.001 | 100.0% |
+| `dct_inconsistency_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | 0.045 [0.005, 0.109] | 0.075 [0.010, 0.174] | -0.000 | 100.0% |
+| `dct_inconsistency_detector` | `gaussian_blur` | `sigma=1.0` | 9 | 0.048 [0.004, 0.099] | 0.084 [0.008, 0.169] | +0.003 | 100.0% |
 | `dct_inconsistency_detector` | `jpeg_compression` | `Q=90` | 9 | 0.047 [0.005, 0.113] | 0.078 [0.010, 0.181] | +0.002 | 100.0% |
-| `deep_forensic_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | 0.026 [0.002, 0.063] | 0.047 [0.004, 0.111] | +0.000 | 100.0% |
-| `deep_forensic_detector` | `brightness_contrast` | `B=1.2_C=1.2` | 9 | 0.027 [0.002, 0.065] | 0.048 [0.004, 0.113] | +0.001 | 100.0% |
-| `deep_forensic_detector` | `downscale_upscale` | `scale=0.50` | 9 | 0.026 [0.002, 0.063] | 0.047 [0.004, 0.110] | -0.000 | 100.0% |
-| `deep_forensic_detector` | `downscale_upscale` | `scale=0.75` | 9 | 0.026 [0.002, 0.063] | 0.047 [0.004, 0.111] | +0.000 | 100.0% |
-| `deep_forensic_detector` | `gaussian_blur` | `sigma=1.0` | 9 | 0.027 [0.002, 0.064] | 0.048 [0.004, 0.112] | +0.000 | 100.0% |
-| `deep_forensic_detector` | `gaussian_blur` | `sigma=2.0` | 9 | 0.027 [0.002, 0.066] | 0.048 [0.004, 0.115] | +0.001 | 100.0% |
 | `deep_forensic_detector` | `identity` | `original` | 9 | 0.026 [0.002, 0.063] | 0.047 [0.004, 0.110] | +0.000 | 100.0% |
-| `deep_forensic_detector` | `jpeg_compression` | `Q=50` | 9 | 0.027 [0.002, 0.064] | 0.048 [0.004, 0.112] | +0.000 | 100.0% |
-| `deep_forensic_detector` | `jpeg_compression` | `Q=75` | 9 | 0.027 [0.002, 0.064] | 0.047 [0.004, 0.111] | +0.000 | 100.0% |
+| `deep_forensic_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | 0.026 [0.002, 0.063] | 0.047 [0.004, 0.111] | +0.000 | 100.0% |
+| `deep_forensic_detector` | `gaussian_blur` | `sigma=1.0` | 9 | 0.027 [0.002, 0.064] | 0.048 [0.004, 0.112] | +0.000 | 100.0% |
 | `deep_forensic_detector` | `jpeg_compression` | `Q=90` | 9 | 0.027 [0.002, 0.064] | 0.047 [0.004, 0.111] | +0.000 | 100.0% |
+| `ela_detector` | `identity` | `original` | 9 | 0.045 [0.006, 0.092] | 0.078 [0.012, 0.158] | +0.000 | 100.0% |
 | `ela_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | 0.043 [0.006, 0.088] | 0.075 [0.011, 0.152] | -0.002 | 100.0% |
-| `ela_detector` | `brightness_contrast` | `B=1.2_C=1.2` | 9 | 0.057 [0.004, 0.132] | 0.094 [0.008, 0.210] | +0.012 | 100.0% |
-| `ela_detector` | `downscale_upscale` | `scale=0.50` | 9 | 0.041 [0.006, 0.091] | 0.070 [0.012, 0.153] | -0.004 | 100.0% |
-| `ela_detector` | `downscale_upscale` | `scale=0.75` | 9 | 0.039 [0.006, 0.088] | 0.068 [0.011, 0.148] | -0.006 | 100.0% |
 | `ela_detector` | `gaussian_blur` | `sigma=1.0` | 9 | 0.033 [0.006, 0.074] | 0.059 [0.012, 0.128] | -0.012 | 100.0% |
+| `ela_detector` | `jpeg_compression` | `Q=90` | 9 | 0.026 [0.002, 0.064] | 0.046 [0.003, 0.110] | -0.019 | 100.0% |
+| `noise_residual_detector` | `identity` | `original` | 9 | 0.075 [0.004, 0.188] | 0.109 [0.008, 0.262] | +0.000 | 88.9% |
+| `noise_residual_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | 0.075 [0.004, 0.190] | 0.109 [0.008, 0.263] | +0.000 | 88.9% |
+| `noise_residual_detector` | `gaussian_blur` | `sigma=1.0` | 9 | 0.076 [0.004, 0.194] | 0.110 [0.008, 0.266] | +0.001 | 88.9% |
+| `noise_residual_detector` | `jpeg_compression` | `Q=90` | 9 | 0.076 [0.004, 0.192] | 0.111 [0.009, 0.266] | +0.002 | 88.9% |
 
 *Note: Refer to `aggregate_metrics.csv` for the complete condition table.*
 
 ### Paired Statistical Significance Tests (Transformed vs. Baseline Identity)
 
+#### Classical Models
+
 | Model | Transformation | Severity | N | Mean Difference | Wilcoxon Stat | Wilcoxon p-value | Cohen's d | Significant (p<0.05) |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `dct_inconsistency_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | -0.0001 | 2.0 | 3.7500e-01 | -0.333 | `False` |
+| `dct_inconsistency_detector` | `brightness_contrast` | `B=1.2_C=1.2` | 9 | -0.0069 | 4.0 | 8.7500e-01 | -0.280 | `False` |
+| `dct_inconsistency_detector` | `downscale_upscale` | `scale=0.50` | 9 | +0.0065 | 4.0 | 8.7500e-01 | +0.149 | `False` |
+| `dct_inconsistency_detector` | `downscale_upscale` | `scale=0.75` | 9 | +0.0062 | 3.0 | 6.2500e-01 | +0.315 | `False` |
+| `deep_forensic_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | +0.0000 | 3.0 | 6.2500e-01 | +0.333 | `False` |
+| `deep_forensic_detector` | `brightness_contrast` | `B=1.2_C=1.2` | 9 | +0.0005 | 3.0 | 6.2500e-01 | +0.345 | `False` |
+| `deep_forensic_detector` | `downscale_upscale` | `scale=0.50` | 9 | -0.0000 | 4.0 | 8.7500e-01 | -0.141 | `False` |
+| `deep_forensic_detector` | `downscale_upscale` | `scale=0.75` | 9 | +0.0001 | 1.0 | 2.5000e-01 | +0.504 | `False` |
 | `ela_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | -0.0022 | 1.0 | 2.5000e-01 | -0.503 | `False` |
 | `ela_detector` | `brightness_contrast` | `B=1.2_C=1.2` | 9 | +0.0120 | 5.0 | 1.0000e+00 | +0.203 | `False` |
 | `ela_detector` | `downscale_upscale` | `scale=0.50` | 9 | -0.0041 | 4.0 | 8.7500e-01 | -0.149 | `False` |
 | `ela_detector` | `downscale_upscale` | `scale=0.75` | 9 | -0.0056 | 4.0 | 8.7500e-01 | -0.201 | `False` |
-| `ela_detector` | `gaussian_blur` | `sigma=1.0` | 9 | -0.0115 | 2.0 | 3.7500e-01 | -0.369 | `False` |
-| `ela_detector` | `gaussian_blur` | `sigma=2.0` | 9 | -0.0106 | 3.0 | 6.2500e-01 | -0.304 | `False` |
-| `ela_detector` | `jpeg_compression` | `Q=50` | 9 | -0.0125 | 1.0 | 2.5000e-01 | -0.378 | `False` |
-| `ela_detector` | `jpeg_compression` | `Q=75` | 9 | -0.0053 | 5.0 | 1.0000e+00 | -0.158 | `False` |
-| `ela_detector` | `jpeg_compression` | `Q=90` | 9 | -0.0187 | 0.0 | 1.2500e-01 | -0.493 | `False` |
 | `noise_residual_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | +0.0000 | 4.0 | 8.7500e-01 | +0.005 | `False` |
 | `noise_residual_detector` | `brightness_contrast` | `B=1.2_C=1.2` | 9 | -0.0022 | 4.0 | 8.7500e-01 | -0.316 | `False` |
 | `noise_residual_detector` | `downscale_upscale` | `scale=0.50` | 9 | +0.0010 | 4.0 | 8.7500e-01 | +0.232 | `False` |
 | `noise_residual_detector` | `downscale_upscale` | `scale=0.75` | 9 | -0.0006 | 2.0 | 3.7500e-01 | -0.354 | `False` |
-| `noise_residual_detector` | `gaussian_blur` | `sigma=1.0` | 9 | +0.0010 | 4.0 | 8.7500e-01 | +0.174 | `False` |
-| `noise_residual_detector` | `gaussian_blur` | `sigma=2.0` | 9 | -0.0061 | 3.0 | 6.2500e-01 | -0.312 | `False` |
+
+*Note: Refer to `statistical_tests.json` for all paired hypothesis tests.*
 
 ### Visualizations: Performance & Degradation Profiles
 
@@ -124,28 +124,28 @@ Localization performance was quantified using pixel-level Intersection over Unio
 
 To test H2 without confounding from mask scale or canvas resolution, partial Pearson correlations were computed controlling for ground-truth manipulation area fraction and pixel resolution:
 
+### Classical Models: Diagnostic Predictors
+
 | Model | Transformation | Diagnostic Feature | Pearson r | Pearson p | Spearman rho | Controlled Partial r | N |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `ela_detector` | `jpeg_compression` | `manipulation_area_fraction` | -0.930 | 2.225e-12 | -0.598 | **-0.912** | 27 |
-| `ela_detector` | `jpeg_compression` | `isoperimetric_quotient` | -0.050 | 8.028e-01 | -0.266 | **+0.387** | 27 |
-| `ela_detector` | `jpeg_compression` | `convex_solidity` | +0.918 | 1.526e-11 | +0.715 | **+0.205** | 27 |
-| `ela_detector` | `jpeg_compression` | `min_border_distance_norm` | +0.535 | 4.030e-03 | +0.631 | **-0.420** | 27 |
-| `ela_detector` | `jpeg_compression` | `connected_components_count` | -0.937 | 6.115e-13 | -0.570 | **-0.273** | 27 |
-| `ela_detector` | `jpeg_compression` | `grad_magnitude_mean` | +0.399 | 3.900e-02 | +0.453 | **-0.264** | 27 |
-| `ela_detector` | `jpeg_compression` | `laplacian_variance` | +0.386 | 4.672e-02 | +0.524 | **-0.345** | 27 |
-| `ela_detector` | `jpeg_compression` | `shannon_entropy` | -0.158 | 4.309e-01 | +0.004 | **-0.325** | 27 |
+| `dct_inconsistency_detector` | `downscale_upscale` | `isoperimetric_quotient` | +0.389 | 1.101e-01 | +0.279 | **+0.711** | 18 |
+| `dct_inconsistency_detector` | `gaussian_blur` | `min_border_distance_norm` | +0.142 | 5.733e-01 | +0.279 | **-0.710** | 18 |
+| `dct_inconsistency_detector` | `gaussian_blur` | `isoperimetric_quotient` | +0.246 | 3.245e-01 | +0.279 | **+0.704** | 18 |
+| `dct_inconsistency_detector` | `downscale_upscale` | `min_border_distance_norm` | -0.128 | 6.115e-01 | +0.279 | **-0.686** | 18 |
+| `deep_forensic_detector` | `jpeg_compression` | `manipulation_area_fraction` | +0.837 | 5.247e-08 | +0.654 | **+0.872** | 27 |
+| `deep_forensic_detector` | `gaussian_blur` | `manipulation_area_fraction` | +0.814 | 3.977e-05 | +0.708 | **+0.771** | 18 |
+| `deep_forensic_detector` | `brightness_contrast` | `manipulation_area_fraction` | +0.716 | 8.326e-04 | +0.564 | **+0.685** | 18 |
+| `deep_forensic_detector` | `downscale_upscale` | `isoperimetric_quotient` | +0.316 | 2.015e-01 | +0.608 | **+0.523** | 18 |
 | `ela_detector` | `gaussian_blur` | `manipulation_area_fraction` | -0.962 | 1.754e-10 | -0.564 | **-0.953** | 18 |
-| `ela_detector` | `gaussian_blur` | `isoperimetric_quotient` | -0.017 | 9.457e-01 | -0.279 | **+0.668** | 18 |
-| `ela_detector` | `gaussian_blur` | `convex_solidity` | +0.952 | 1.247e-09 | +0.657 | **+0.352** | 18 |
-| `ela_detector` | `gaussian_blur` | `min_border_distance_norm` | +0.535 | 2.209e-02 | +0.618 | **-0.679** | 18 |
-| `ela_detector` | `gaussian_blur` | `connected_components_count` | -0.968 | 4.549e-11 | -0.570 | **-0.360** | 18 |
-| `ela_detector` | `gaussian_blur` | `grad_magnitude_mean` | +0.397 | 1.033e-01 | +0.510 | **-0.420** | 18 |
-| `ela_detector` | `gaussian_blur` | `laplacian_variance` | +0.383 | 1.169e-01 | +0.546 | **-0.537** | 18 |
-| `ela_detector` | `gaussian_blur` | `shannon_entropy` | -0.169 | 5.035e-01 | -0.050 | **-0.506** | 18 |
-| `ela_detector` | `downscale_upscale` | `manipulation_area_fraction` | -0.868 | 3.042e-06 | +0.264 | **-0.835** | 18 |
-| `ela_detector` | `downscale_upscale` | `isoperimetric_quotient` | +0.122 | 6.293e-01 | +0.668 | **+0.773** | 18 |
-| `ela_detector` | `downscale_upscale` | `convex_solidity` | +0.908 | 1.936e-07 | -0.046 | **+0.405** | 18 |
+| `ela_detector` | `jpeg_compression` | `manipulation_area_fraction` | -0.930 | 2.225e-12 | -0.598 | **-0.912** | 27 |
 | `ela_detector` | `downscale_upscale` | `min_border_distance_norm` | +0.339 | 1.686e-01 | -0.229 | **-0.858** | 18 |
+| `ela_detector` | `downscale_upscale` | `manipulation_area_fraction` | -0.868 | 3.042e-06 | +0.264 | **-0.835** | 18 |
+| `noise_residual_detector` | `jpeg_compression` | `manipulation_area_fraction` | +0.816 | 2.105e-07 | +0.248 | **+0.765** | 27 |
+| `noise_residual_detector` | `brightness_contrast` | `isoperimetric_quotient` | -0.317 | 1.992e-01 | -0.464 | **-0.613** | 18 |
+| `noise_residual_detector` | `brightness_contrast` | `min_border_distance_norm` | +0.157 | 5.330e-01 | -0.015 | **+0.611** | 18 |
+| `noise_residual_detector` | `brightness_contrast` | `laplacian_variance` | +0.057 | 8.213e-01 | -0.178 | **+0.576** | 18 |
+
+*Note: Refer to `correlations.csv` for the complete diagnostic correlation table.*
 
 ![Property vs Degradation](plots/scatter_property_vs_delta_iou.png)
 
@@ -153,6 +153,13 @@ To test H2 without confounding from mask scale or canvas resolution, partial Pea
 
 - **Simultaneous Multi-Model Failure Rate**: `88.9%`
 - **Model-Specific Failures**: `0` instances
+
+### Model-Specific Failure Breakdown by Category
+
+| Category | Models Evaluated | Total Model-Specific Failures |
+| :--- | :--- | :--- |
+| **Classical Models** | `dct_inconsistency_detector, deep_forensic_detector, ela_detector, noise_residual_detector` | 0 |
+| **Integrated Models** | `None` | 0 |
 
 ![Shared Failure Analysis](plots/shared_failure_analysis.png)
 
