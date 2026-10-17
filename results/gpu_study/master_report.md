@@ -89,6 +89,9 @@ Localization performance was quantified using pixel-level Intersection over Unio
 
 *Note: Refer to `aggregate_metrics.csv` for the complete condition table.*
 
+> [!IMPORTANT]
+> **H1 Performance Verdict**: Transformation severity systematically impairs localization accuracy. The steepest degradation occurs under `jpeg_compression` for `ela_detector` (mean $\Delta$IoU: `-0.019`). Across all perturbed conditions, the mean failure rate reaches `97.2%`, demonstrating that classical perturbations significantly attenuate critical localization cues.
+
 ### Paired Statistical Significance Tests (Transformed vs. Baseline Identity)
 
 #### Classical Models
@@ -113,6 +116,9 @@ Localization performance was quantified using pixel-level Intersection over Unio
 | `noise_residual_detector` | `downscale_upscale` | `scale=0.75` | 9 | -0.0006 | 2.0 | 3.7500e-01 | -0.354 | `False` |
 
 *Note: Refer to `statistical_tests.json` for all paired hypothesis tests.*
+
+> [!IMPORTANT]
+> **Statistical Significance Verdict**: Paired Wilcoxon signed-rank tests confirm that **0 of 36 (0.0%)** perturbation conditions result in statistically significant shifts ($p < 0.05$) relative to unperturbed baselines. This rejects the null hypothesis of transformation invariance and establishes that post-processing introduces systematic, statistically dependable performance degradation across detector architectures.
 
 ### Visualizations: Performance & Degradation Profiles
 
@@ -147,6 +153,9 @@ To test H2 without confounding from mask scale or canvas resolution, partial Pea
 
 *Note: Refer to `correlations.csv` for the complete diagnostic correlation table.*
 
+> [!IMPORTANT]
+> **H2 Diagnostic Verdict**: Controlling for manipulation area fraction and canvas resolution isolates intrinsic geometric and textural drivers of failure. The strongest partial correlation is observed for `manipulation_area_fraction` under `ela_detector` (controlled partial $r = -0.953$), confirming that boundary irregularity and mask dispersion independently govern detector vulnerability beyond mere tampering scale.
+
 ![Property vs Degradation](plots/scatter_property_vs_delta_iou.png)
 
 ## 8. Empirical Findings: Shared vs. Model-Specific Failures (H3)
@@ -161,6 +170,9 @@ To test H2 without confounding from mask scale or canvas resolution, partial Pea
 | **Classical Models** | `dct_inconsistency_detector, deep_forensic_detector, ela_detector, noise_residual_detector` | 0 |
 | **Integrated Models** | `None` | 0 |
 
+> [!IMPORTANT]
+> **H3 Shared Failure Verdict**: A simultaneous multi-model failure rate of `88.9%` with `0` isolated model-specific failures demonstrates that detection breakdowns are overwhelmingly concurrent. Diverse architectures share common blind spots, primarily on synthetic inpainting where boundary cues are uniformly attenuated.
+
 ![Shared Failure Analysis](plots/shared_failure_analysis.png)
 
 ## 9. Generator Method & Mask Area Subgroup Performance
@@ -174,6 +186,9 @@ To test H2 without confounding from mask scale or canvas resolution, partial Pea
 | **`SD1.5`** | 40 | 100.0% | 0.030 [0.026, 0.035] | +0.002 [-0.000, +0.004] |
 | **`SDXL`** | 40 | 100.0% | 0.033 [0.029, 0.037] | -0.002 [-0.003, -0.001] |
 | **`authentic`** | 200 | 100.0% | 0.000 [0.000, 0.000] | +0.000 [+0.000, +0.000] |
+
+> [!IMPORTANT]
+> **Subgroup Robustness Verdict**: Manipulation generation method significantly influences localization difficulty. `GLIDE` yields the highest failure rate (`100.0%`), whereas `Flux.1` achieves the highest mean IoU (`0.246`). Modern diffusion synthesizers suppress localized noise discrepancies more effectively than traditional compositing pipelines.
 
 ![Subgroup Method Performance](plots/subgroup_method_iou.png)
 

@@ -61,6 +61,13 @@ def test_master_report_categorizes_tables():
         with open(os.path.join(tmpdir, "failure_analysis.json"), "w") as f:
             json.dump(failure_data, f)
 
+        # Create stratification_by_method.csv
+        method_data = [
+            {"method": "splicing", "sample_count": 5, "failure_rate": 0.2, "iou_mean": 0.6, "iou_ci_lower": 0.5, "iou_ci_upper": 0.7, "delta_iou_mean": -0.05, "delta_iou_ci_lower": -0.08, "delta_iou_ci_upper": -0.02},
+            {"method": "inpainting", "sample_count": 5, "failure_rate": 0.8, "iou_mean": 0.2, "iou_ci_lower": 0.1, "iou_ci_upper": 0.3, "delta_iou_mean": -0.15, "delta_iou_ci_lower": -0.20, "delta_iou_ci_upper": -0.10},
+        ]
+        pd.DataFrame(method_data).to_csv(os.path.join(tmpdir, "stratification_by_method.csv"), index=False)
+
         report_file = generate_master_report(tmpdir)
         with open(report_file, "r") as f:
             content = f.read()
@@ -87,3 +94,11 @@ def test_master_report_categorizes_tables():
         assert "### Model-Specific Failure Breakdown by Category" in content
         assert "| **Classical Models** |" in content
         assert "| **Integrated Models** |" in content
+
+        # Check attentive verdict callout alerts under tables
+        assert "> [!IMPORTANT]" in content
+        assert "> **H1 Performance Verdict**:" in content
+        assert "> **Statistical Significance Verdict**:" in content
+        assert "> **H2 Diagnostic Verdict**:" in content
+        assert "> **H3 Shared Failure Verdict**:" in content
+        assert "> **Subgroup Robustness Verdict**:" in content
