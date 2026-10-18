@@ -1,12 +1,12 @@
 {
-  "total_evaluations": 360,
+  "total_evaluations": 270,
   "unique_samples": 9,
   "models_evaluated": [
     "dct_inconsistency_detector",
-    "deep_forensic_detector",
     "ela_detector",
     "noise_residual_detector"
   ],
+  "oom_models_skipped": [],
   "transformations_evaluated": [
     "brightness_contrast",
     "downscale_upscale",
@@ -14,7 +14,7 @@
     "identity",
     "jpeg_compression"
   ],
-  "overall_failure_rate": 0.9722222222222222,
+  "overall_failure_rate": 0.9629629629629629,
   "failure_analysis_summary": {
     "all_models_failed_rate": 0.8888888888888888,
     "model_specific_failure_count": 0

@@ -9,6 +9,7 @@
       "smoothing_sigma": 2.0
     },
     "description": "Error Level Analysis: detects JPEG recompression artifact discrepancies.",
+    "category": "Classical Models",
     "registered": true,
     "load_successful": true
   },
@@ -22,6 +23,7 @@
       "filter_type": "laplacian"
     },
     "description": "High-pass spatial noise residual variance inconsistency detector.",
+    "category": "Classical Models",
     "registered": true,
     "load_successful": true
   },
@@ -33,6 +35,7 @@
       "threshold": 0.5
     },
     "description": "Local 8x8 block boundary discontinuity and energy inconsistency.",
+    "category": "Classical Models",
     "registered": true,
     "load_successful": true
   },
@@ -40,12 +43,20 @@
     "name": "deep_forensic_detector",
     "family": "deep_constrained_cnn",
     "device": "cuda:0",
+    "available": false,
+    "checkpoint_path": null,
+    "random_init_blocked": true,
+    "status_notice": "Quitting with notice: DeepForensicNet ('deep_forensic_detector') has no published online pretrained checkpoint and no local checkpoint was provided. Running with randomly initialized weights is prohibited.",
+    "load_error": "Quitting with notice: DeepForensicNet ('deep_forensic_detector') has no published online pretrained checkpoint and no local checkpoint was provided. Running with randomly initialized weights is prohibited.",
+    "online_checkpoint_available": false,
+    "online_checkpoint_source": "None (custom BayarConv2d CNN architecture without published online weights)",
     "parameters": {
       "threshold": 0.5,
       "architecture": "BayarConv2d + MultiScaleResNet"
     },
     "description": "Deep PyTorch neural network with adaptive Bayar constrained residual convolutions.",
+    "category": "Classical Models",
     "registered": true,
-    "load_successful": true
+    "load_successful": false
   }
 ]

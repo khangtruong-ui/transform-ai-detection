@@ -9,7 +9,6 @@ Reference:
 from __future__ import annotations
 
 import logging
-import os
 import time
 from typing import Any, Dict, Optional, Union
 import numpy as np
@@ -19,6 +18,12 @@ import torch.nn.functional as F
 from PIL import Image
 
 from transform_ai_detection.models.base import BaseLocalizationModel, ModelOutput
+from transform_ai_detection.models.checkpoint_hub import (
+    extract_state_dict,
+    get_online_checkpoint_info,
+    resolve_or_download_checkpoint,
+    validate_and_load_state_dict,
+)
 from transform_ai_detection.hardware import get_torch_device
 
 logger = logging.getLogger(__name__)
@@ -36,7 +41,6 @@ class ForensicPromptQuery(nn.Module):
     def forward(self, visual_tokens: torch.Tensor) -> torch.Tensor:
         b = visual_tokens.shape[0]
         q = self.queries.expand(b, -1, -1)
-        # Visual tokens attend to queries
         attn_out, _ = self.cross_attn(visual_tokens, q, q)
         return self.norm(visual_tokens + attn_out)
 
@@ -48,7 +52,6 @@ class SIDANet(nn.Module):
         super().__init__()
         self.dim = dim
 
-        # Multi-scale visual backbone resistant to social media compression
         self.stem = nn.Sequential(
             nn.Conv2d(in_channels, 16, kernel_size=3, stride=2, padding=1),
             nn.BatchNorm2d(16),
@@ -63,7 +66,6 @@ class SIDANet(nn.Module):
 
         self.forensic_query = ForensicPromptQuery(num_queries=4, dim=dim)
 
-        # Multi-scale decoder with skip-connection
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(dim, 32, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(32),
@@ -77,30 +79,17 @@ class SIDANet(nn.Module):
             nn.Conv2d(8, 1, kernel_size=3, padding=1),
         )
 
-        self._init_weights()
-
-    def _init_weights(self) -> None:
-        torch.manual_seed(42)
-        for m in self.modules():
-            if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d, nn.Linear)):
-                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-                if m.bias is not None:
-                    nn.init.constant_(m.bias, 0.0)
-            elif isinstance(m, (nn.BatchNorm2d, nn.LayerNorm)):
-                nn.init.constant_(m.weight, 1.0)
-                nn.init.constant_(m.bias, 0.0)
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        b, c, h, w = x.shape
+        b, _, h, w = x.shape
         pad_h = (8 - h % 8) % 8
         pad_w = (8 - w % 8) % 8
         if pad_h > 0 or pad_w > 0:
             x = F.pad(x, (0, pad_w, 0, pad_h), mode="reflect")
 
-        feats = self.stem(x)  # (B, dim, H/8, W/8)
+        feats = self.stem(x)
         _, _, hf, wf = feats.shape
 
-        tokens = feats.flatten(2).transpose(1, 2)  # (B, N, dim)
+        tokens = feats.flatten(2).transpose(1, 2)
         conditioned = self.forensic_query(tokens)
         spatial = conditioned.transpose(1, 2).view(b, self.dim, hf, wf)
 
@@ -110,58 +99,79 @@ class SIDANet(nn.Module):
 
 
 class SIDAModel(BaseLocalizationModel):
-    """Adapter model for SIDA (Huang et al., CVPR 2025)."""
+    """Adapter model for SIDA (Huang et al., CVPR 2025).
+
+    Watches for pretrained checkpoints locally and online (Hugging Face saberzl/SIDA-7B).
+    Refuses to run with randomly initialized weights.
+    """
 
     def __init__(
         self,
         checkpoint_path: Optional[str] = None,
         device: Union[str, torch.device] = "auto",
         threshold: float = 0.5,
-        require_checkpoint: bool = False,
+        require_checkpoint: bool = True,
+        auto_download: Optional[bool] = None,
+        cache_dir: Optional[str] = None,
     ) -> None:
         self.checkpoint_path = checkpoint_path
         self.device = get_torch_device(device if isinstance(device, str) else str(device))
         self.threshold = threshold
-        self.require_checkpoint = require_checkpoint
+        self.require_checkpoint = True  # Random weight execution is strictly prohibited
+        self.auto_download = auto_download
+        self.cache_dir = cache_dir
 
         self.model = SIDANet().to(self.device)
         self.model.eval()
 
         self._is_loaded = False
+        self._random_init_blocked = False
         self._load_error: Optional[str] = None
 
         self._resolve_and_load_checkpoint()
 
     def _resolve_and_load_checkpoint(self) -> bool:
-        candidate_paths = []
-        if self.checkpoint_path:
-            candidate_paths.append(self.checkpoint_path)
+        resolved_path, err_notice = resolve_or_download_checkpoint(
+            model_name=self.name,
+            checkpoint_path=self.checkpoint_path,
+            auto_download=self.auto_download,
+            cache_dir=self.cache_dir,
+        )
+        if resolved_path is None:
+            self._load_error = err_notice
+            self._random_init_blocked = True
+            self._is_loaded = False
+            logger.warning(f"[{self.name}] {self._load_error}")
+            return False
 
-        candidate_paths.extend([
-            os.path.expanduser("~/.cache/iml_models/sida.pth"),
-            "checkpoints/sida.pth",
-        ])
+        try:
+            logger.info(f"Loading SIDA weights from {resolved_path}")
+            ckpt = torch.load(resolved_path, map_location=self.device, weights_only=False)
+            state_dict = extract_state_dict(ckpt)
+            ok, val_err = validate_and_load_state_dict(self.model, state_dict, self.name)
+            if not ok:
+                self._load_error = val_err
+                self._random_init_blocked = True
+                self._is_loaded = False
+                logger.warning(f"[{self.name}] {self._load_error}")
+                return False
 
-        for path in candidate_paths:
-            if path and os.path.exists(path):
-                try:
-                    logger.info(f"Loading SIDA weights from {path}")
-                    ckpt = torch.load(path, map_location=self.device)
-                    state = ckpt.get("state_dict", ckpt.get("model", ckpt))
-                    self.model.load_state_dict(state, strict=False)
-                    self._is_loaded = True
-                    self.checkpoint_path = path
-                    return True
-                except Exception as e:
-                    self._load_error = str(e)
-                    logger.warning(f"Failed to load SIDA checkpoint from {path}: {e}")
-
-        if not self.require_checkpoint:
+            self.model.to(self.device)
+            self.model.eval()
+            self.checkpoint_path = resolved_path
             self._is_loaded = True
+            self._random_init_blocked = False
+            self._load_error = None
             return True
-
-        self._is_loaded = False
-        return False
+        except Exception as e:
+            self._load_error = (
+                f"Quitting with notice: Failed to load SIDA checkpoint from '{resolved_path}': {e}. "
+                f"Running with randomly initialized weights is prohibited."
+            )
+            self._random_init_blocked = True
+            self._is_loaded = False
+            logger.warning(f"[{self.name}] {self._load_error}")
+            return False
 
     @property
     def name(self) -> str:
@@ -171,13 +181,18 @@ class SIDAModel(BaseLocalizationModel):
         return self._is_loaded
 
     def get_model_info(self) -> Dict[str, Any]:
+        online_info = get_online_checkpoint_info(self.name)
         return {
             "name": self.name,
             "family": "multimodal_forensic_prompt_queries",
             "device": str(self.device),
             "available": self.is_available(),
             "checkpoint_path": self.checkpoint_path,
+            "random_init_blocked": self._random_init_blocked,
+            "status_notice": self._load_error,
             "load_error": self._load_error,
+            "online_checkpoint_available": online_info.get("online_available", False),
+            "online_checkpoint_source": online_info.get("primary_source_desc"),
             "parameters": {
                 "threshold": self.threshold,
                 "forensic_queries": 4,
@@ -190,12 +205,10 @@ class SIDAModel(BaseLocalizationModel):
     def predict(self, image: Image.Image) -> ModelOutput:
         if not self.is_available():
             raise RuntimeError(
-                f"SIDA model is not available. Checkpoint: {self.checkpoint_path}, "
-                f"Error: {self._load_error}"
+                f"SIDA model is not available. {self._load_error}"
             )
 
         start_t = time.perf_counter()
-        w, h = image.size
 
         img_arr = np.array(image.convert("RGB"), dtype=np.float32) / 255.0
         img_t = torch.from_numpy(img_arr).permute(2, 0, 1).unsqueeze(0).to(self.device)

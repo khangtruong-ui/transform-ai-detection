@@ -9,6 +9,7 @@
       "smoothing_sigma": 2.0
     },
     "description": "Error Level Analysis: detects JPEG recompression artifact discrepancies.",
+    "category": "Classical Models",
     "registered": true,
     "load_successful": true
   },
@@ -22,6 +23,7 @@
       "filter_type": "laplacian"
     },
     "description": "High-pass spatial noise residual variance inconsistency detector.",
+    "category": "Classical Models",
     "registered": true,
     "load_successful": true
   },
@@ -33,6 +35,7 @@
       "threshold": 0.5
     },
     "description": "Local 8x8 block boundary discontinuity and energy inconsistency.",
+    "category": "Classical Models",
     "registered": true,
     "load_successful": true
   },
@@ -40,21 +43,33 @@
     "name": "deep_forensic_detector",
     "family": "deep_constrained_cnn",
     "device": "cuda:0",
+    "available": false,
+    "checkpoint_path": null,
+    "random_init_blocked": true,
+    "status_notice": "Quitting with notice: DeepForensicNet ('deep_forensic_detector') has no published online pretrained checkpoint and no local checkpoint was provided. Running with randomly initialized weights is prohibited.",
+    "load_error": "Quitting with notice: DeepForensicNet ('deep_forensic_detector') has no published online pretrained checkpoint and no local checkpoint was provided. Running with randomly initialized weights is prohibited.",
+    "online_checkpoint_available": false,
+    "online_checkpoint_source": "None (custom BayarConv2d CNN architecture without published online weights)",
     "parameters": {
       "threshold": 0.5,
       "architecture": "BayarConv2d + MultiScaleResNet"
     },
     "description": "Deep PyTorch neural network with adaptive Bayar constrained residual convolutions.",
+    "category": "Classical Models",
     "registered": true,
-    "load_successful": true
+    "load_successful": false
   },
   {
     "name": "trufor",
     "family": "deep_cross_modal_transformer",
     "available": true,
-    "checkpoint_path": null,
+    "checkpoint_path": "/root/.cache/iml_models/trufor.pth.tar",
     "device": "cuda:0",
+    "random_init_blocked": false,
+    "status_notice": null,
     "load_error": null,
+    "online_checkpoint_available": true,
+    "online_checkpoint_source": "hf://DaniilOr/detect/weights/trufor.pth.tar & https://www.grip.unina.it/download/prog/TruFor/TruFor_weights.zip",
     "parameters": {
       "threshold": 0.5,
       "streams": [
@@ -65,6 +80,7 @@
     },
     "paper_reference": "Guillaro et al. (CVPR 2023) TruFor: leveraging all-round clues for trustworthy image forgery detection and localization",
     "description": "TruFor: RGB and Noiseprint++ Cross-Modal Transformer for Manipulation Localization.",
+    "category": "Integrated Models",
     "registered": true,
     "load_successful": true
   },
@@ -73,8 +89,12 @@
     "family": "sparse_coding_vision_transformer",
     "device": "cuda:0",
     "available": true,
-    "checkpoint_path": null,
+    "checkpoint_path": "/root/.cache/iml_models/sparsevit.pth",
+    "random_init_blocked": false,
+    "status_notice": null,
     "load_error": null,
+    "online_checkpoint_available": true,
+    "online_checkpoint_source": "gdrive://104BPPvLXkxuPu_NHaxjesdcdZ-ln92-G (scu-zjz/SparseViT)",
     "parameters": {
       "threshold": 0.5,
       "embed_dim": 64,
@@ -83,6 +103,7 @@
     },
     "paper_reference": "Su et al. (AAAI 2025) Can we get rid of handcrafted feature extractors? SparseViT",
     "description": "SparseViT: Non-semantics-centered sparse coding transformer for manipulation localization.",
+    "category": "Integrated Models",
     "registered": true,
     "load_successful": true
   },
@@ -91,8 +112,12 @@
     "family": "hierarchical_vision_transformer",
     "device": "cuda:0",
     "available": true,
-    "checkpoint_path": null,
+    "checkpoint_path": "/root/.cache/iml_models/iml_vit.pth",
+    "random_init_blocked": false,
+    "status_notice": null,
     "load_error": null,
+    "online_checkpoint_available": true,
+    "online_checkpoint_source": "hf://suncore147/imdl-benco/IML_ViT/checkpoint-199.pth & Google Drive (SunnyHaze/IML-ViT)",
     "parameters": {
       "threshold": 0.5,
       "stages": [
@@ -104,6 +129,7 @@
     },
     "paper_reference": "Ma et al. (AAAI 2024) IML-ViT: benchmarking image manipulation localization by vision transformer",
     "description": "IML-ViT: Hierarchical vision transformer benchmarking architecture with progressive feature aggregation.",
+    "category": "Integrated Models",
     "registered": true,
     "load_successful": true
   },
@@ -112,15 +138,20 @@
     "family": "progressive_spatio_channel_correlation_cnn",
     "device": "cuda:0",
     "available": true,
-    "checkpoint_path": null,
+    "checkpoint_path": "/root/.cache/iml_models/pscc_net.pth",
+    "random_init_blocked": false,
+    "status_notice": null,
     "load_error": null,
+    "online_checkpoint_available": true,
+    "online_checkpoint_source": "https://github.com/proteus1991/PSCC-Net (HRNet + NLCDetection + DetectionHead)",
     "parameters": {
       "threshold": 0.5,
       "correlation": "spatial + channel",
-      "stages": 3
+      "stages": 4
     },
     "paper_reference": "Liu et al. (IEEE TCSVT 2022) PSCC-Net: progressive spatio-channel correlation network",
     "description": "PSCC-Net: Progressive spatio-channel correlation network for manipulation localization.",
+    "category": "Integrated Models",
     "registered": true,
     "load_successful": true
   },
@@ -129,14 +160,19 @@
     "family": "reinforcement_learning_decision_environment",
     "device": "cuda:0",
     "available": true,
-    "checkpoint_path": null,
+    "checkpoint_path": "/root/.cache/iml_models/code.pth",
+    "random_init_blocked": false,
+    "status_notice": null,
     "load_error": null,
+    "online_checkpoint_available": true,
+    "online_checkpoint_source": "gdrive://1aXTKhn-vKu4fG7XdKyWv4AWZVMkcIdd3 (siriusPRX/CoDE CoDE_pre-trained.pth)",
     "parameters": {
       "threshold": 0.5,
       "actions": "continuous_and_discrete"
     },
     "paper_reference": "Peng et al. (IEEE TIFS 2024) Employing reinforcement learning to construct a decision-making environment for image forgery localization",
     "description": "CoDE: Continuous and discrete decision-making environment for tampering localization.",
+    "category": "Integrated Models",
     "registered": true,
     "load_successful": true
   },
@@ -145,8 +181,12 @@
     "family": "dense_clip_feature_fusion",
     "device": "cuda:0",
     "available": true,
-    "checkpoint_path": null,
+    "checkpoint_path": "/root/.cache/iml_models/maskclip.pth",
+    "random_init_blocked": false,
+    "status_notice": null,
     "load_error": null,
+    "online_checkpoint_available": true,
+    "online_checkpoint_source": "hf://nebula/MaskCLIP-weights/MaskCLIP_sd15_20241103_17_45_16.pth (iamwangyabin/OpenSDI)",
     "parameters": {
       "threshold": 0.5,
       "embed_dim": 64,
@@ -154,6 +194,7 @@
     },
     "paper_reference": "Wang et al. (CVPR 2025) OpenSDI: spotting diffusion-generated images in the open world",
     "description": "MaskCLIP: Pretrained vision-model dense feature fusion for manipulation localization.",
+    "category": "Integrated Models",
     "registered": true,
     "load_successful": true
   },
@@ -161,9 +202,13 @@
     "name": "sida",
     "family": "multimodal_forensic_prompt_queries",
     "device": "cuda:0",
-    "available": true,
+    "available": false,
     "checkpoint_path": null,
-    "load_error": null,
+    "random_init_blocked": true,
+    "status_notice": "Quitting with notice: Failed to download online pretrained weights for 'sida' (Source 'saberzl/SIDA-7B' requires ~16 GB LLaVA-7B + SAM-ViT-H weights (set IML_DOWNLOAD_LARGE_LLM=1 or place checkpoint at /root/.cache/iml_models/sida.pth)). Running with randomly initialized weights is prohibited.",
+    "load_error": "Quitting with notice: Failed to download online pretrained weights for 'sida' (Source 'saberzl/SIDA-7B' requires ~16 GB LLaVA-7B + SAM-ViT-H weights (set IML_DOWNLOAD_LARGE_LLM=1 or place checkpoint at /root/.cache/iml_models/sida.pth)). Running with randomly initialized weights is prohibited.",
+    "online_checkpoint_available": true,
+    "online_checkpoint_source": "hf://saberzl/SIDA-7B & https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth",
     "parameters": {
       "threshold": 0.5,
       "forensic_queries": 4,
@@ -171,16 +216,21 @@
     },
     "paper_reference": "Huang et al. (CVPR 2025) SIDA: social media image deepfake detection, localization and explanation",
     "description": "SIDA: Social media image deepfake detection, localization and explanation architecture.",
+    "category": "Integrated Models",
     "registered": true,
-    "load_successful": true
+    "load_successful": false
   },
   {
     "name": "rita",
     "family": "process_aware_autoregressive_transformer",
     "device": "cuda:0",
-    "available": true,
+    "available": false,
     "checkpoint_path": null,
-    "load_error": null,
+    "random_init_blocked": true,
+    "status_notice": "Quitting with notice: Official RITA weights (scu-zjz/RITA) are only released on password-protected Baidu Netdisk (https://pan.baidu.com/s/1W1HC4_mn044ub2NLJLSeQQ?pwd=43nn) and no local checkpoint was found. Running with randomly initialized weights is prohibited.",
+    "load_error": "Quitting with notice: Official RITA weights (scu-zjz/RITA) are only released on password-protected Baidu Netdisk (https://pan.baidu.com/s/1W1HC4_mn044ub2NLJLSeQQ?pwd=43nn) and no local checkpoint was found. Running with randomly initialized weights is prohibited.",
+    "online_checkpoint_available": false,
+    "online_checkpoint_source": "Unavailable publicly (password-protected Baidu Netdisk: pan.baidu.com/s/1W1HC4_mn044ub2NLJLSeQQ?pwd=43nn)",
     "parameters": {
       "threshold": 0.5,
       "autoregressive_blocks": 2,
@@ -188,7 +238,8 @@
     },
     "paper_reference": "Zhu et al. (CVPR Findings 2026) Revisiting image manipulation localization under realistic manipulation scenarios",
     "description": "RITA: Process-aware autoregressive localizer for realistic manipulation scenarios.",
+    "category": "Integrated Models",
     "registered": true,
-    "load_successful": true
+    "load_successful": false
   }
 ]

@@ -1,7 +1,6 @@
 {
   "models": [
     "dct_inconsistency_detector",
-    "deep_forensic_detector",
     "ela_detector",
     "noise_residual_detector"
   ],
@@ -13,32 +12,22 @@
   "model_specific_failure_count": 0,
   "model_specific_breakdown": {
     "dct_inconsistency_detector": 0,
-    "deep_forensic_detector": 0,
     "ela_detector": 0,
     "noise_residual_detector": 0
   },
   "pairwise_jaccard_similarity": {
     "dct_inconsistency_detector": {
       "dct_inconsistency_detector": 1.0,
-      "deep_forensic_detector": 1.0,
-      "ela_detector": 1.0,
-      "noise_residual_detector": 0.8888888888888888
-    },
-    "deep_forensic_detector": {
-      "dct_inconsistency_detector": 1.0,
-      "deep_forensic_detector": 1.0,
       "ela_detector": 1.0,
       "noise_residual_detector": 0.8888888888888888
     },
     "ela_detector": {
       "dct_inconsistency_detector": 1.0,
-      "deep_forensic_detector": 1.0,
       "ela_detector": 1.0,
       "noise_residual_detector": 0.8888888888888888
     },
     "noise_residual_detector": {
       "dct_inconsistency_detector": 0.8888888888888888,
-      "deep_forensic_detector": 0.8888888888888888,
       "ela_detector": 0.8888888888888888,
       "noise_residual_detector": 1.0
     }
@@ -46,25 +35,16 @@
   "pairwise_correlation": {
     "dct_inconsistency_detector": {
       "dct_inconsistency_detector": 1.0,
-      "deep_forensic_detector": 1.0,
-      "ela_detector": 1.0,
-      "noise_residual_detector": 0.0
-    },
-    "deep_forensic_detector": {
-      "dct_inconsistency_detector": 1.0,
-      "deep_forensic_detector": 1.0,
       "ela_detector": 1.0,
       "noise_residual_detector": 0.0
     },
     "ela_detector": {
       "dct_inconsistency_detector": 1.0,
-      "deep_forensic_detector": 1.0,
       "ela_detector": 1.0,
       "noise_residual_detector": 0.0
     },
     "noise_residual_detector": {
       "dct_inconsistency_detector": 0.0,
-      "deep_forensic_detector": 0.0,
       "ela_detector": 0.0,
       "noise_residual_detector": 0.9999999999999998
     }

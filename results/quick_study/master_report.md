@@ -1,7 +1,7 @@
 # Master Research Report: Transformation Robustness and Failure Analysis for AI Image Manipulation Localization
 
 > **Experiment Run**: `810 total evaluations completed`
-> **Generated Artifacts Directory**: `/root/transform-ai-detection/results/quick_study`
+> **Generated Artifacts Directory**: `/workspace/transform-ai-detection/results/quick_study`
 
 ## 1. Executive Summary
 

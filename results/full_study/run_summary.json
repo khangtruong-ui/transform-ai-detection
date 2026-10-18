@@ -1,26 +1,12 @@
 {
-  "total_evaluations": 17052,
+  "total_evaluations": 5670,
   "unique_samples": 90,
   "models_evaluated": [
-    "code",
     "dct_inconsistency_detector",
-    "deep_forensic_detector",
     "ela_detector",
-    "iml_vit",
-    "maskclip",
-    "noise_residual_detector",
-    "pscc_net",
-    "rita",
-    "sida",
-    "sparsevit",
-    "trufor"
+    "noise_residual_detector"
   ],
-  "oom_models_skipped": [
-    "iml_vit",
-    "pscc_net",
-    "sparsevit",
-    "trufor"
-  ],
+  "oom_models_skipped": [],
   "transformations_evaluated": [
     "brightness_contrast",
     "downscale_upscale",
@@ -30,10 +16,10 @@
     "jpeg_compression",
     "sharpening"
   ],
-  "overall_failure_rate": 0.9641097818437719,
+  "overall_failure_rate": 0.9615520282186949,
   "failure_analysis_summary": {
-    "all_models_failed_rate": 0.9979296066252588,
-    "model_specific_failure_count": 0
+    "all_models_failed_rate": 0.9121693121693122,
+    "model_specific_failure_count": 42
   },
   "artifacts_generated": [
     "aggregate_metrics.csv",
@@ -42,7 +28,6 @@
     "correlations.csv",
     "failure_analysis.json",
     "stratification_by_method.csv",
-    "stratification_by_mask_area.csv",
-    "oom_models.json"
+    "stratification_by_mask_area.csv"
   ]
 }

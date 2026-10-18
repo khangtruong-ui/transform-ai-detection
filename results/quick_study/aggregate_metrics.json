@@ -1,6 +1,7 @@
 [
   {
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "brightness_contrast",
     "severity_label": "B=0.8_C=0.8",
     "n_samples": 27,
@@ -48,6 +49,7 @@
   },
   {
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "brightness_contrast",
     "severity_label": "B=1.2_C=1.2",
     "n_samples": 27,
@@ -95,6 +97,7 @@
   },
   {
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "downscale_upscale",
     "severity_label": "scale=0.50",
     "n_samples": 27,
@@ -142,6 +145,7 @@
   },
   {
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "downscale_upscale",
     "severity_label": "scale=0.75",
     "n_samples": 27,
@@ -189,6 +193,7 @@
   },
   {
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "gaussian_blur",
     "severity_label": "sigma=1.0",
     "n_samples": 27,
@@ -236,6 +241,7 @@
   },
   {
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "gaussian_blur",
     "severity_label": "sigma=2.0",
     "n_samples": 27,
@@ -283,6 +289,7 @@
   },
   {
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "identity",
     "severity_label": "original",
     "n_samples": 27,
@@ -330,6 +337,7 @@
   },
   {
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=50",
     "n_samples": 27,
@@ -377,6 +385,7 @@
   },
   {
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=75",
     "n_samples": 27,
@@ -424,6 +433,7 @@
   },
   {
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=90",
     "n_samples": 27,
@@ -471,6 +481,7 @@
   },
   {
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "brightness_contrast",
     "severity_label": "B=0.8_C=0.8",
     "n_samples": 27,
@@ -518,6 +529,7 @@
   },
   {
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "brightness_contrast",
     "severity_label": "B=1.2_C=1.2",
     "n_samples": 27,
@@ -565,6 +577,7 @@
   },
   {
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "downscale_upscale",
     "severity_label": "scale=0.50",
     "n_samples": 27,
@@ -612,6 +625,7 @@
   },
   {
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "downscale_upscale",
     "severity_label": "scale=0.75",
     "n_samples": 27,
@@ -659,6 +673,7 @@
   },
   {
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "gaussian_blur",
     "severity_label": "sigma=1.0",
     "n_samples": 27,
@@ -706,6 +721,7 @@
   },
   {
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "gaussian_blur",
     "severity_label": "sigma=2.0",
     "n_samples": 27,
@@ -753,6 +769,7 @@
   },
   {
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "identity",
     "severity_label": "original",
     "n_samples": 27,
@@ -800,6 +817,7 @@
   },
   {
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=50",
     "n_samples": 27,
@@ -847,6 +865,7 @@
   },
   {
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=75",
     "n_samples": 27,
@@ -894,6 +913,7 @@
   },
   {
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=90",
     "n_samples": 27,
@@ -941,6 +961,7 @@
   },
   {
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "brightness_contrast",
     "severity_label": "B=0.8_C=0.8",
     "n_samples": 27,
@@ -988,6 +1009,7 @@
   },
   {
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "brightness_contrast",
     "severity_label": "B=1.2_C=1.2",
     "n_samples": 27,
@@ -1035,6 +1057,7 @@
   },
   {
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "downscale_upscale",
     "severity_label": "scale=0.50",
     "n_samples": 27,
@@ -1082,6 +1105,7 @@
   },
   {
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "downscale_upscale",
     "severity_label": "scale=0.75",
     "n_samples": 27,
@@ -1129,6 +1153,7 @@
   },
   {
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "gaussian_blur",
     "severity_label": "sigma=1.0",
     "n_samples": 27,
@@ -1176,6 +1201,7 @@
   },
   {
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "gaussian_blur",
     "severity_label": "sigma=2.0",
     "n_samples": 27,
@@ -1223,6 +1249,7 @@
   },
   {
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "identity",
     "severity_label": "original",
     "n_samples": 27,
@@ -1270,6 +1297,7 @@
   },
   {
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=50",
     "n_samples": 27,
@@ -1317,6 +1345,7 @@
   },
   {
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=75",
     "n_samples": 27,
@@ -1364,6 +1393,7 @@
   },
   {
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=90",
     "n_samples": 27,

@@ -9,6 +9,7 @@
       "smoothing_sigma": 2.0
     },
     "description": "Error Level Analysis: detects JPEG recompression artifact discrepancies.",
+    "category": "Classical Models",
     "registered": true,
     "load_successful": true
   },
@@ -22,6 +23,7 @@
       "filter_type": "laplacian"
     },
     "description": "High-pass spatial noise residual variance inconsistency detector.",
+    "category": "Classical Models",
     "registered": true,
     "load_successful": true
   },
@@ -33,6 +35,7 @@
       "threshold": 0.5
     },
     "description": "Local 8x8 block boundary discontinuity and energy inconsistency.",
+    "category": "Classical Models",
     "registered": true,
     "load_successful": true
   }

@@ -119,6 +119,18 @@ def generate_master_report(output_dir: str) -> str:
             f"> **GPU Out-of-Memory (OOM) Exclusions**: The following model(s) were automatically skipped during evaluation due to hardware VRAM exhaustion: `{', '.join(sorted(oom_models))}`.\n"
         )
 
+    blocked_random_models = [
+        m for m in models_rep
+        if not m.get("load_successful", True) and m.get("random_init_blocked", False)
+    ]
+    if blocked_random_models:
+        blocked_names = [m.get("name", "") for m in blocked_random_models]
+        lines.append(
+            f"> [!NOTE]\n"
+            f"> **Strict Pretrained Checkpoint Policy (Random Initialization Prohibited)**: Neural models without verified pretrained checkpoints are strictly prohibited from running with randomly initialized weights and automatically quit with notice. "
+            f"Skipped with notice ({len(blocked_names)}): `{', '.join(blocked_names)}`.\n"
+        )
+
     def render_models_table(m_list: List[Dict[str, Any]]) -> List[str]:
         t_lines = [
             "| Model Name | Architecture Family | Device | Status | Description |",
@@ -129,9 +141,15 @@ def generate_master_report(output_dir: str) -> str:
             if m_name in oom_models:
                 status_str = "Skipped (OOM - Out of Memory)"
             elif m.get("load_successful"):
-                status_str = "Active"
+                if m.get("has_pretrained_weights") or m.get("checkpoint_path"):
+                    status_str = "Active (Pretrained Checkpoint Loaded)"
+                else:
+                    status_str = "Active"
+            elif m.get("random_init_blocked"):
+                status_str = "Quit with Notice (No Pretrained Weights — Random Init Prohibited)"
             else:
-                status_str = f"Unavailable ({m.get('error', 'check checkpoint')})"
+                err_msg = m.get("load_error") or m.get("error", "check checkpoint")
+                status_str = f"Unavailable ({err_msg})"
             t_lines.append(
                 f"| **`{m_name}`** | {m.get('family', 'N/A')} | `{m.get('device', 'cpu')}` | {status_str} | {m.get('description', '')} |"
             )
@@ -152,6 +170,31 @@ def generate_master_report(output_dir: str) -> str:
 
     if not classical_models_rep and not integrated_models_rep and models_rep:
         lines.extend(render_models_table(models_rep))
+        lines.append("")
+
+    neural_checkpoint_models = [
+        m for m in models_rep
+        if m.get("random_init_blocked") is not None or m.get("online_checkpoint_info") or m.get("online_checkpoint_source") or m.get("status_notice")
+    ]
+    if neural_checkpoint_models:
+        lines.append("### Online Checkpoint Discovery & Notice Log\n")
+        lines.append("| Model Name | Pretrained Weights Loaded | Official Repository / Source | Checkpoint / Quit Notice |")
+        lines.append("| :--- | :--- | :--- | :--- |")
+        for m in neural_checkpoint_models:
+            m_name = m.get("name", "")
+            is_loaded = bool(m.get("has_pretrained_weights") or (m.get("load_successful") and m.get("checkpoint_path")))
+            loaded = "Yes" if is_loaded else "No (Quit with Notice)"
+            online_info = m.get("online_checkpoint_info") or {}
+            repo_url = online_info.get("official_repo") or m.get("online_checkpoint_source") or "N/A"
+            repo_cell = f"`{repo_url}`" if repo_url != "N/A" else "`None (Local Only)`"
+            default_ok_msg = (
+                f"Verified pretrained checkpoint loaded (`{m.get('checkpoint_path')}`)."
+                if m.get("checkpoint_path")
+                else "Verified checkpoint loaded."
+            )
+            notice = m.get("status_notice") or m.get("load_error") or default_ok_msg
+            notice_clean = str(notice).replace("|", "\\|").replace("\n", " ")
+            lines.append(f"| **`{m_name}`** | `{loaded}` | {repo_cell} | {notice_clean} |")
         lines.append("")
 
     # 5. Transformation Specifications

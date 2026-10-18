@@ -102,3 +102,50 @@ def test_master_report_categorizes_tables():
         assert "> **H2 Diagnostic Verdict**:" in content
         assert "> **H3 Shared Failure Verdict**:" in content
         assert "> **Subgroup Robustness Verdict**:" in content
+
+
+def test_master_report_renders_random_init_blocked_notices():
+    with tempfile.TemporaryDirectory() as tmpdir:
+        models_rep = [
+            {
+                "name": "ela_detector",
+                "family": "forensic",
+                "device": "cpu",
+                "load_successful": True,
+                "description": "ELA",
+            },
+            {
+                "name": "pscc_net",
+                "family": "cnn",
+                "device": "cpu",
+                "load_successful": True,
+                "checkpoint_path": "/root/.cache/iml_models/pscc_net.pth",
+                "online_checkpoint_source": "https://github.com/proteus1991/PSCC-Net",
+                "random_init_blocked": False,
+                "description": "PSCC-Net",
+            },
+            {
+                "name": "rita",
+                "family": "transformer",
+                "device": "cpu",
+                "load_successful": False,
+                "random_init_blocked": True,
+                "online_checkpoint_source": "Unavailable publicly (Baidu Netdisk)",
+                "status_notice": "Quitting with notice: Official RITA weights are on password-protected Baidu Netdisk.",
+                "description": "RITA",
+            },
+        ]
+        with open(os.path.join(tmpdir, "models_report.json"), "w") as f:
+            json.dump(models_rep, f)
+
+        report_file = generate_master_report(tmpdir)
+        with open(report_file, "r") as f:
+            content = f.read()
+
+        assert "Strict Pretrained Checkpoint Policy (Random Initialization Prohibited)" in content
+        assert "Quit with Notice (No Pretrained Weights — Random Init Prohibited)" in content
+        assert "Active (Pretrained Checkpoint Loaded)" in content
+        assert "### Online Checkpoint Discovery & Notice Log" in content
+        assert "`rita`" in content
+        assert "`pscc_net`" in content
+

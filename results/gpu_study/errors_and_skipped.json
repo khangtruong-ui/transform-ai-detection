@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "stage": "model_unavailable_notice",
+    "model": "deep_forensic_detector",
+    "random_init_blocked": true,
+    "notice": "Quitting with notice: DeepForensicNet ('deep_forensic_detector') has no published online pretrained checkpoint and no local checkpoint was provided. Running with randomly initialized weights is prohibited."
+  }
+]

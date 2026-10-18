@@ -6,6 +6,7 @@
     "ela_detector",
     "noise_residual_detector"
   ],
+  "oom_models_skipped": [],
   "transformations_evaluated": [
     "brightness_contrast",
     "downscale_upscale",

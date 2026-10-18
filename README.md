@@ -2,7 +2,7 @@
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Tests: Pytest](https://img.shields.io/badge/tests-59%20passing-brightgreen.svg)](tests/)
+[![Tests: Pytest](https://img.shields.io/badge/tests-64%20passing-brightgreen.svg)](tests/)
 
 A reproducible, inference-only research codebase designed to study how classical image transformations impact pretrained AI image manipulation localization (IML) models, and how intrinsic image/mask geometric and morphological properties govern localization success and failure.
 
@@ -142,10 +142,20 @@ The framework defines an extensible `BaseLocalizationModel` interface with stand
 12. **`sida` (SIDA)**: Social media image deepfake detection, localization and explanation with large multimodal architecture (Huang et al., CVPR 2025). Uses learnable forensic prompt query embeddings interacting across multi-scale visual features.
 13. **`rita` (RITA)**: Process-aware autoregressive localizer for realistic manipulation scenarios (Zhu et al., CVPR Findings 2026). Models sequential manipulation steps and post-processing distortions via causal autoregressive transformer blocks and boundary refinement.
 
-### Checkpoint Loading & Availability
-All deep models support checkpoint loading via `checkpoint_path` or standard cache directories (`~/.cache/iml_models/{model}.pth`, `checkpoints/{model}.pth`). When model weights are absent:
-- If `require_checkpoint=False` (default for inference & integration testing), the model automatically initializes its integrated PyTorch architecture with deterministic forensic priors and executes on GPU CUDA or CPU.
-- If `require_checkpoint=True`, the model gracefully reports `is_available() -> False` without failing ungracefully.
+### Online Checkpoint Discovery & Strict No-Random-Init Policy
+All neural localization models watch for pretrained checkpoints locally (`checkpoint_path`, `~/.cache/iml_models/{model}.pth`, `checkpoints/{model}.pth`) and automatically resolve/download published online weights via `checkpoint_hub.py` (`ONLINE_CHECKPOINT_REGISTRY`):
+- **`pscc_net`**: Automatically downloads official multi-branch HRNet-W18 + NLCDetection + DetectionHead weights from `proteus1991/PSCC-Net` (`OfficialPSCCNet`).
+- **`trufor`**: Automatically downloads official Dual-SegFormer (`mit_b2`) + Noiseprint++ (`DnCNN`) weights from Hugging Face (`DaniilOr/detect`) or GRIP-UNINA (`OfficialTruForNet`).
+- **`iml_vit`**: Automatically downloads official ViT-B Window-Attention + SimpleFPN weights from Hugging Face (`suncore147/imdl-benco` / `nebula/MaskCLIP-weights`) or Google Drive (`OfficialIMLViTNet`).
+- **`sparsevit`**: Automatically downloads official SparseViT (`scu-zjz/SparseViT`) weights from Google Drive (`104BPPvLXkxuPu_NHaxjesdcdZ-ln92-G`, `OfficialSparseViTNet`).
+- **`code`**: Automatically downloads official AC_CoDE (`siriusPRX/CoDE`) reinforcement learning weights from Google Drive (`1aXTKhn-vKu4fG7XdKyWv4AWZVMkcIdd3`, `OfficialCoDENet`).
+- **`maskclip`**: Automatically downloads official SideCLIP/MaskCLIP (`weryw/MaskCLIP` / `nebula/MaskCLIP-weights`) weights from Hugging Face (`OfficialMaskCLIPNet`).
+- **`sida` / `rita` / `deep_forensic_detector`**: Check local cache paths (`~/.cache/iml_models/{model}.pth`, `checkpoints/{model}.pth`); `sida` (~16 GB LLaVA-7B + SAM-ViT-H) and `rita` (password-protected Baidu Netdisk) quit with an explicit notice when local weights are absent.
+
+**Strict Pretrained Checkpoint Enforcement**:
+- **No model that would run with randomly initialized weights is ever permitted to run.**
+- Loaded checkpoints are strictly validated (`validate_and_load_state_dict`) to verify key and tensor shape match ratios before marking any neural model available.
+- Any model without a verified pretrained checkpoint immediately quits with a clear notice (`is_available() -> False`, `random_init_blocked = True`, logged in `models_report.json`, `errors_and_skipped.json`, and `master_report.md`, and raising `RuntimeError` with notice if `predict()` is invoked).
 
 ### Existing Model & OOM Skipping
 To conserve compute, prevent crashes on GPU VRAM limits, and resume experiments seamlessly:

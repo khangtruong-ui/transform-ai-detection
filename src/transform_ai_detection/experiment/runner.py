@@ -313,7 +313,21 @@ class ExperimentRunner:
                 if mod.is_available():
                     models[m_name] = mod
                 else:
-                    logger.warning(f"Model {m_name} reported unavailable; skipping.")
+                    info = mod.get_model_info()
+                    notice = (
+                        info.get("status_notice")
+                        or info.get("load_error")
+                        or "Model unavailable (no pretrained checkpoint loaded; random weight initialization prohibited)."
+                    )
+                    logger.warning(f"Model '{m_name}' quitting with notice: {notice}")
+                    self.errors_log.append(
+                        {
+                            "stage": "model_unavailable_notice",
+                            "model": m_name,
+                            "random_init_blocked": bool(info.get("random_init_blocked", False)),
+                            "notice": notice,
+                        }
+                    )
             except Exception as e:
                 if is_oom_exception(e):
                     logger.error(f"OOM during instantiation of model {m_name}: {e}")

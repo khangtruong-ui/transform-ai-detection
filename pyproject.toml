@@ -33,6 +33,12 @@ dependencies = [
     "pyarrow>=14.0.0",
     "torch>=2.0.0",
     "torchvision>=0.15.0",
+    "huggingface-hub>=0.20.0",
+    "gdown>=5.0.0",
+    "timm>=0.9.0",
+    "einops>=0.7.0",
+    "efficientnet-pytorch>=0.7.1",
+    "yacs>=0.1.8",
     "parquet-dataset-loader @ git+https://github.com/khangtruong-ui/parquet-dataset-loader.git",
 ]
 

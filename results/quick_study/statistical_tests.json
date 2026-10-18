@@ -10,6 +10,7 @@
     "cohens_d": -0.15847906387568017,
     "is_significant_005": false,
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "brightness_contrast",
     "severity_label": "B=0.8_C=0.8",
     "metric": "iou"
@@ -25,6 +26,7 @@
     "cohens_d": -0.0938709656357012,
     "is_significant_005": false,
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "brightness_contrast",
     "severity_label": "B=1.2_C=1.2",
     "metric": "iou"
@@ -40,6 +42,7 @@
     "cohens_d": -0.11599676419855101,
     "is_significant_005": false,
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "downscale_upscale",
     "severity_label": "scale=0.50",
     "metric": "iou"
@@ -55,6 +58,7 @@
     "cohens_d": -0.15853584756517478,
     "is_significant_005": false,
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "downscale_upscale",
     "severity_label": "scale=0.75",
     "metric": "iou"
@@ -70,6 +74,7 @@
     "cohens_d": -0.15642311445042842,
     "is_significant_005": false,
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "gaussian_blur",
     "severity_label": "sigma=1.0",
     "metric": "iou"
@@ -85,6 +90,7 @@
     "cohens_d": -0.09722039861333914,
     "is_significant_005": false,
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "gaussian_blur",
     "severity_label": "sigma=2.0",
     "metric": "iou"
@@ -100,6 +106,7 @@
     "cohens_d": -0.2688854379714477,
     "is_significant_005": false,
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=50",
     "metric": "iou"
@@ -115,6 +122,7 @@
     "cohens_d": -0.20350106540775328,
     "is_significant_005": false,
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=75",
     "metric": "iou"
@@ -130,6 +138,7 @@
     "cohens_d": -0.2920197680611305,
     "is_significant_005": true,
     "model": "ela_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=90",
     "metric": "iou"
@@ -145,6 +154,7 @@
     "cohens_d": 0.19092929503564188,
     "is_significant_005": false,
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "brightness_contrast",
     "severity_label": "B=0.8_C=0.8",
     "metric": "iou"
@@ -160,6 +170,7 @@
     "cohens_d": 0.09633869367264747,
     "is_significant_005": false,
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "brightness_contrast",
     "severity_label": "B=1.2_C=1.2",
     "metric": "iou"
@@ -175,6 +186,7 @@
     "cohens_d": 0.28869803699858054,
     "is_significant_005": false,
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "downscale_upscale",
     "severity_label": "scale=0.50",
     "metric": "iou"
@@ -190,6 +202,7 @@
     "cohens_d": 0.2503613162578343,
     "is_significant_005": false,
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "downscale_upscale",
     "severity_label": "scale=0.75",
     "metric": "iou"
@@ -205,6 +218,7 @@
     "cohens_d": 0.30069863779653194,
     "is_significant_005": false,
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "gaussian_blur",
     "severity_label": "sigma=1.0",
     "metric": "iou"
@@ -220,6 +234,7 @@
     "cohens_d": 0.08060059213211089,
     "is_significant_005": false,
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "gaussian_blur",
     "severity_label": "sigma=2.0",
     "metric": "iou"
@@ -235,6 +250,7 @@
     "cohens_d": 0.14356036061569244,
     "is_significant_005": false,
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=50",
     "metric": "iou"
@@ -250,6 +266,7 @@
     "cohens_d": 0.2718541995041753,
     "is_significant_005": false,
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=75",
     "metric": "iou"
@@ -265,6 +282,7 @@
     "cohens_d": 0.4698135514345197,
     "is_significant_005": true,
     "model": "noise_residual_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=90",
     "metric": "iou"
@@ -280,6 +298,7 @@
     "cohens_d": -0.12916219463438003,
     "is_significant_005": false,
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "brightness_contrast",
     "severity_label": "B=0.8_C=0.8",
     "metric": "iou"
@@ -295,6 +314,7 @@
     "cohens_d": -0.12210354318539235,
     "is_significant_005": false,
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "brightness_contrast",
     "severity_label": "B=1.2_C=1.2",
     "metric": "iou"
@@ -310,6 +330,7 @@
     "cohens_d": 0.3030673992901013,
     "is_significant_005": false,
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "downscale_upscale",
     "severity_label": "scale=0.50",
     "metric": "iou"
@@ -325,6 +346,7 @@
     "cohens_d": 0.41018849068254837,
     "is_significant_005": true,
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "downscale_upscale",
     "severity_label": "scale=0.75",
     "metric": "iou"
@@ -340,6 +362,7 @@
     "cohens_d": 0.23448365514816158,
     "is_significant_005": false,
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "gaussian_blur",
     "severity_label": "sigma=1.0",
     "metric": "iou"
@@ -355,6 +378,7 @@
     "cohens_d": 0.08376256733976153,
     "is_significant_005": false,
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "gaussian_blur",
     "severity_label": "sigma=2.0",
     "metric": "iou"
@@ -370,6 +394,7 @@
     "cohens_d": -0.062151681629114816,
     "is_significant_005": false,
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=50",
     "metric": "iou"
@@ -385,6 +410,7 @@
     "cohens_d": 0.17213036320852415,
     "is_significant_005": false,
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=75",
     "metric": "iou"
@@ -400,6 +426,7 @@
     "cohens_d": 0.3056236443342456,
     "is_significant_005": false,
     "model": "dct_inconsistency_detector",
+    "model_category": "Classical Models",
     "transform_name": "jpeg_compression",
     "severity_label": "Q=90",
     "metric": "iou"

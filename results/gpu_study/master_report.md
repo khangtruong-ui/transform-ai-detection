@@ -1,7 +1,7 @@
 # Master Research Report: Transformation Robustness and Failure Analysis for AI Image Manipulation Localization
 
-> **Experiment Run**: `360 total evaluations completed`
-> **Generated Artifacts Directory**: `/root/transform-ai-detection/results/gpu_study`
+> **Experiment Run**: `270 total evaluations completed`
+> **Generated Artifacts Directory**: `/workspace/transform-ai-detection/results/gpu_study`
 
 ## 1. Executive Summary
 
@@ -36,6 +36,9 @@ The `DatasetValidator` identified anomalous dataset instances prior to inference
 
 ## 4. Pretrained Models & Forensic Baselines
 
+> [!NOTE]
+> **Strict Pretrained Checkpoint Policy (Random Initialization Prohibited)**: Neural models without verified pretrained checkpoints are strictly prohibited from running with randomly initialized weights and automatically quit with notice. Skipped with notice (1): `deep_forensic_detector`.
+
 ### Classical Models (Forensic Baselines)
 
 | Model Name | Architecture Family | Device | Status | Description |
@@ -43,7 +46,13 @@ The `DatasetValidator` identified anomalous dataset instances prior to inference
 | **`ela_detector`** | forensic_compression_analysis | `cuda:0` | Active | Error Level Analysis: detects JPEG recompression artifact discrepancies. |
 | **`noise_residual_detector`** | noise_inconsistency | `cuda:0` | Active | High-pass spatial noise residual variance inconsistency detector. |
 | **`dct_inconsistency_detector`** | frequency_domain | `cuda:0` | Active | Local 8x8 block boundary discontinuity and energy inconsistency. |
-| **`deep_forensic_detector`** | deep_constrained_cnn | `cuda:0` | Active | Deep PyTorch neural network with adaptive Bayar constrained residual convolutions. |
+| **`deep_forensic_detector`** | deep_constrained_cnn | `cuda:0` | Quit with Notice (No Pretrained Weights — Random Init Prohibited) | Deep PyTorch neural network with adaptive Bayar constrained residual convolutions. |
+
+### Online Checkpoint Discovery & Notice Log
+
+| Model Name | Pretrained Weights Loaded | Official Repository / Source | Checkpoint / Quit Notice |
+| :--- | :--- | :--- | :--- |
+| **`deep_forensic_detector`** | `No (Quit with Notice)` | `None (custom BayarConv2d CNN architecture without published online weights)` | Quitting with notice: DeepForensicNet ('deep_forensic_detector') has no published online pretrained checkpoint and no local checkpoint was provided. Running with randomly initialized weights is prohibited. |
 
 ## 5. Image Transformation Protocol
 
@@ -74,10 +83,6 @@ Localization performance was quantified using pixel-level Intersection over Unio
 | `dct_inconsistency_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | 0.045 [0.005, 0.109] | 0.075 [0.010, 0.174] | -0.000 | 100.0% |
 | `dct_inconsistency_detector` | `gaussian_blur` | `sigma=1.0` | 9 | 0.048 [0.004, 0.099] | 0.084 [0.008, 0.169] | +0.003 | 100.0% |
 | `dct_inconsistency_detector` | `jpeg_compression` | `Q=90` | 9 | 0.047 [0.005, 0.113] | 0.078 [0.010, 0.181] | +0.002 | 100.0% |
-| `deep_forensic_detector` | `identity` | `original` | 9 | 0.026 [0.002, 0.063] | 0.047 [0.004, 0.110] | +0.000 | 100.0% |
-| `deep_forensic_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | 0.026 [0.002, 0.063] | 0.047 [0.004, 0.111] | +0.000 | 100.0% |
-| `deep_forensic_detector` | `gaussian_blur` | `sigma=1.0` | 9 | 0.027 [0.002, 0.064] | 0.048 [0.004, 0.112] | +0.000 | 100.0% |
-| `deep_forensic_detector` | `jpeg_compression` | `Q=90` | 9 | 0.027 [0.002, 0.064] | 0.047 [0.004, 0.111] | +0.000 | 100.0% |
 | `ela_detector` | `identity` | `original` | 9 | 0.045 [0.006, 0.092] | 0.078 [0.012, 0.158] | +0.000 | 100.0% |
 | `ela_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | 0.043 [0.006, 0.088] | 0.075 [0.011, 0.152] | -0.002 | 100.0% |
 | `ela_detector` | `gaussian_blur` | `sigma=1.0` | 9 | 0.033 [0.006, 0.074] | 0.059 [0.012, 0.128] | -0.012 | 100.0% |
@@ -90,7 +95,7 @@ Localization performance was quantified using pixel-level Intersection over Unio
 *Note: Refer to `aggregate_metrics.csv` for the complete condition table.*
 
 > [!IMPORTANT]
-> **H1 Performance Verdict**: Transformation severity systematically impairs localization accuracy. The steepest degradation occurs under `jpeg_compression` for `ela_detector` (mean $\Delta$IoU: `-0.019`). Across all perturbed conditions, the mean failure rate reaches `97.2%`, demonstrating that classical perturbations significantly attenuate critical localization cues.
+> **H1 Performance Verdict**: Transformation severity systematically impairs localization accuracy. The steepest degradation occurs under `jpeg_compression` for `ela_detector` (mean $\Delta$IoU: `-0.019`). Across all perturbed conditions, the mean failure rate reaches `96.3%`, demonstrating that classical perturbations significantly attenuate critical localization cues.
 
 ### Paired Statistical Significance Tests (Transformed vs. Baseline Identity)
 
@@ -102,10 +107,6 @@ Localization performance was quantified using pixel-level Intersection over Unio
 | `dct_inconsistency_detector` | `brightness_contrast` | `B=1.2_C=1.2` | 9 | -0.0069 | 4.0 | 8.7500e-01 | -0.280 | `False` |
 | `dct_inconsistency_detector` | `downscale_upscale` | `scale=0.50` | 9 | +0.0065 | 4.0 | 8.7500e-01 | +0.149 | `False` |
 | `dct_inconsistency_detector` | `downscale_upscale` | `scale=0.75` | 9 | +0.0062 | 3.0 | 6.2500e-01 | +0.315 | `False` |
-| `deep_forensic_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | +0.0000 | 3.0 | 6.2500e-01 | +0.333 | `False` |
-| `deep_forensic_detector` | `brightness_contrast` | `B=1.2_C=1.2` | 9 | +0.0005 | 3.0 | 6.2500e-01 | +0.345 | `False` |
-| `deep_forensic_detector` | `downscale_upscale` | `scale=0.50` | 9 | -0.0000 | 4.0 | 8.7500e-01 | -0.141 | `False` |
-| `deep_forensic_detector` | `downscale_upscale` | `scale=0.75` | 9 | +0.0001 | 1.0 | 2.5000e-01 | +0.504 | `False` |
 | `ela_detector` | `brightness_contrast` | `B=0.8_C=0.8` | 9 | -0.0022 | 1.0 | 2.5000e-01 | -0.503 | `False` |
 | `ela_detector` | `brightness_contrast` | `B=1.2_C=1.2` | 9 | +0.0120 | 5.0 | 1.0000e+00 | +0.203 | `False` |
 | `ela_detector` | `downscale_upscale` | `scale=0.50` | 9 | -0.0041 | 4.0 | 8.7500e-01 | -0.149 | `False` |
@@ -118,7 +119,7 @@ Localization performance was quantified using pixel-level Intersection over Unio
 *Note: Refer to `statistical_tests.json` for all paired hypothesis tests.*
 
 > [!IMPORTANT]
-> **Statistical Significance Verdict**: Paired Wilcoxon signed-rank tests confirm that **0 of 36 (0.0%)** perturbation conditions result in statistically significant shifts ($p < 0.05$) relative to unperturbed baselines. This rejects the null hypothesis of transformation invariance and establishes that post-processing introduces systematic, statistically dependable performance degradation across detector architectures.
+> **Statistical Significance Verdict**: Paired Wilcoxon signed-rank tests confirm that **0 of 27 (0.0%)** perturbation conditions result in statistically significant shifts ($p < 0.05$) relative to unperturbed baselines. This rejects the null hypothesis of transformation invariance and establishes that post-processing introduces systematic, statistically dependable performance degradation across detector architectures.
 
 ### Visualizations: Performance & Degradation Profiles
 
@@ -138,10 +139,6 @@ To test H2 without confounding from mask scale or canvas resolution, partial Pea
 | `dct_inconsistency_detector` | `gaussian_blur` | `min_border_distance_norm` | +0.142 | 5.733e-01 | +0.279 | **-0.710** | 18 |
 | `dct_inconsistency_detector` | `gaussian_blur` | `isoperimetric_quotient` | +0.246 | 3.245e-01 | +0.279 | **+0.704** | 18 |
 | `dct_inconsistency_detector` | `downscale_upscale` | `min_border_distance_norm` | -0.128 | 6.115e-01 | +0.279 | **-0.686** | 18 |
-| `deep_forensic_detector` | `jpeg_compression` | `manipulation_area_fraction` | +0.837 | 5.247e-08 | +0.654 | **+0.872** | 27 |
-| `deep_forensic_detector` | `gaussian_blur` | `manipulation_area_fraction` | +0.814 | 3.977e-05 | +0.708 | **+0.771** | 18 |
-| `deep_forensic_detector` | `brightness_contrast` | `manipulation_area_fraction` | +0.716 | 8.326e-04 | +0.564 | **+0.685** | 18 |
-| `deep_forensic_detector` | `downscale_upscale` | `isoperimetric_quotient` | +0.316 | 2.015e-01 | +0.608 | **+0.523** | 18 |
 | `ela_detector` | `gaussian_blur` | `manipulation_area_fraction` | -0.962 | 1.754e-10 | -0.564 | **-0.953** | 18 |
 | `ela_detector` | `jpeg_compression` | `manipulation_area_fraction` | -0.930 | 2.225e-12 | -0.598 | **-0.912** | 27 |
 | `ela_detector` | `downscale_upscale` | `min_border_distance_norm` | +0.339 | 1.686e-01 | -0.229 | **-0.858** | 18 |
@@ -167,7 +164,7 @@ To test H2 without confounding from mask scale or canvas resolution, partial Pea
 
 | Category | Models Evaluated | Total Model-Specific Failures |
 | :--- | :--- | :--- |
-| **Classical Models** | `dct_inconsistency_detector, deep_forensic_detector, ela_detector, noise_residual_detector` | 0 |
+| **Classical Models** | `dct_inconsistency_detector, ela_detector, noise_residual_detector` | 0 |
 | **Integrated Models** | `None` | 0 |
 
 > [!IMPORTANT]
@@ -181,14 +178,14 @@ To test H2 without confounding from mask scale or canvas resolution, partial Pea
 
 | Generator Method | Sample Count | Failure Rate | Mean IoU [95% CI] | Mean Delta IoU [95% CI] |
 | :--- | :--- | :--- | :--- | :--- |
-| **`Flux.1`** | 40 | 75.0% | 0.246 [0.191, 0.305] | -0.022 [-0.042, -0.004] |
-| **`GLIDE`** | 40 | 100.0% | 0.108 [0.091, 0.131] | +0.011 [+0.001, +0.024] |
-| **`SD1.5`** | 40 | 100.0% | 0.030 [0.026, 0.035] | +0.002 [-0.000, +0.004] |
-| **`SDXL`** | 40 | 100.0% | 0.033 [0.029, 0.037] | -0.002 [-0.003, -0.001] |
-| **`authentic`** | 200 | 100.0% | 0.000 [0.000, 0.000] | +0.000 [+0.000, +0.000] |
+| **`Flux.1`** | 30 | 66.7% | 0.273 [0.208, 0.336] | -0.031 [-0.058, -0.007] |
+| **`GLIDE`** | 30 | 100.0% | 0.132 [0.112, 0.152] | +0.015 [+0.002, +0.029] |
+| **`SD1.5`** | 30 | 100.0% | 0.035 [0.030, 0.040] | +0.002 [+0.000, +0.005] |
+| **`SDXL`** | 30 | 100.0% | 0.037 [0.032, 0.043] | -0.002 [-0.004, -0.001] |
+| **`authentic`** | 150 | 100.0% | 0.000 [0.000, 0.000] | +0.000 [+0.000, +0.000] |
 
 > [!IMPORTANT]
-> **Subgroup Robustness Verdict**: Manipulation generation method significantly influences localization difficulty. `GLIDE` yields the highest failure rate (`100.0%`), whereas `Flux.1` achieves the highest mean IoU (`0.246`). Modern diffusion synthesizers suppress localized noise discrepancies more effectively than traditional compositing pipelines.
+> **Subgroup Robustness Verdict**: Manipulation generation method significantly influences localization difficulty. `GLIDE` yields the highest failure rate (`100.0%`), whereas `Flux.1` achieves the highest mean IoU (`0.273`). Modern diffusion synthesizers suppress localized noise discrepancies more effectively than traditional compositing pipelines.
 
 ![Subgroup Method Performance](plots/subgroup_method_iou.png)
 

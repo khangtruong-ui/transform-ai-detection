@@ -8,7 +8,6 @@ Reference:
 from __future__ import annotations
 
 import logging
-import os
 import time
 from typing import Any, Dict, Optional, Union
 import numpy as np
@@ -18,6 +17,13 @@ import torch.nn.functional as F
 from PIL import Image
 
 from transform_ai_detection.models.base import BaseLocalizationModel, ModelOutput
+from transform_ai_detection.models.checkpoint_hub import (
+    extract_state_dict,
+    get_online_checkpoint_info,
+    resolve_or_download_checkpoint,
+    validate_and_load_state_dict,
+)
+from transform_ai_detection.models.official_architectures import OfficialTruForNet
 from transform_ai_detection.hardware import get_torch_device
 
 logger = logging.getLogger(__name__)
@@ -60,9 +66,9 @@ class CrossModalAttention(nn.Module):
 
     def forward(self, rgb_feat: torch.Tensor, noise_feat: torch.Tensor) -> torch.Tensor:
         b, c, h, w = rgb_feat.shape
-        q = self.q_proj(rgb_feat).view(b, c, h * w).permute(0, 2, 1)  # (B, HW, C)
-        k = self.k_proj(noise_feat).view(b, c, h * w)  # (B, C, HW)
-        v = self.v_proj(noise_feat).view(b, c, h * w).permute(0, 2, 1)  # (B, HW, C)
+        q = self.q_proj(rgb_feat).view(b, c, h * w).permute(0, 2, 1)
+        k = self.k_proj(noise_feat).view(b, c, h * w)
+        v = self.v_proj(noise_feat).view(b, c, h * w).permute(0, 2, 1)
 
         scores = torch.matmul(q, k) / (c ** 0.5)
         attn = F.softmax(scores, dim=-1)
@@ -75,7 +81,6 @@ class TruForNet(nn.Module):
 
     def __init__(self) -> None:
         super().__init__()
-        # RGB stream
         self.rgb_stream = nn.Sequential(
             nn.Conv2d(3, 16, kernel_size=3, stride=2, padding=1),
             nn.BatchNorm2d(16),
@@ -84,8 +89,6 @@ class TruForNet(nn.Module):
             nn.BatchNorm2d(32),
             nn.ReLU(inplace=True),
         )
-
-        # Noise residual stream
         self.noise_filter = ConstrainedNoiseFilter(3, 8, kernel_size=5)
         self.noise_stream = nn.Sequential(
             nn.Conv2d(8, 16, kernel_size=3, stride=2, padding=1),
@@ -95,11 +98,7 @@ class TruForNet(nn.Module):
             nn.BatchNorm2d(32),
             nn.ReLU(inplace=True),
         )
-
-        # Cross-modal fusion
         self.cross_attn = CrossModalAttention(dim=32)
-
-        # Localization decoder
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(32, 16, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(16),
@@ -110,21 +109,8 @@ class TruForNet(nn.Module):
             nn.Conv2d(8, 1, kernel_size=3, padding=1),
         )
 
-        self._init_weights()
-
-    def _init_weights(self) -> None:
-        torch.manual_seed(42)
-        for m in self.modules():
-            if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
-                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-                if m.bias is not None:
-                    nn.init.constant_(m.bias, 0.0)
-            elif isinstance(m, nn.BatchNorm2d):
-                nn.init.constant_(m.weight, 1.0)
-                nn.init.constant_(m.bias, 0.0)
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        b, c, h, w = x.shape
+        _, _, h, w = x.shape
         pad_h = (4 - h % 4) % 4
         pad_w = (4 - w % 4) % 4
         if pad_h > 0 or pad_w > 0:
@@ -142,11 +128,10 @@ class TruForNet(nn.Module):
 
 
 class TruForAdapter(BaseLocalizationModel):
-    """Adapter for TruFor neural network architecture.
+    """Adapter for TruFor neural network architecture (Guillaro et al., CVPR 2023).
 
-    Maintains backwards compatibility with previous TruForAdapter interface,
-    supports loading official checkpoints, and falls back to integrated TruForNet
-    with full GPU acceleration.
+    Watches for pretrained checkpoints locally and online (Hugging Face DaniilOr/detect,
+    official GRIP-UNINA archive, and IMDL-BenCo). Refuses to run with randomly initialized weights.
     """
 
     def __init__(
@@ -154,18 +139,23 @@ class TruForAdapter(BaseLocalizationModel):
         checkpoint_path: Optional[str] = None,
         device: Union[str, torch.device] = "auto",
         threshold: float = 0.5,
-        require_checkpoint: bool = False,
+        require_checkpoint: bool = True,
+        auto_download: Optional[bool] = None,
+        cache_dir: Optional[str] = None,
     ) -> None:
         self.checkpoint_path = checkpoint_path
         self.requested_device = device
         self.device = get_torch_device(device if isinstance(device, str) else str(device))
         self.threshold = threshold
-        self.require_checkpoint = require_checkpoint
+        self.require_checkpoint = True  # Random weight execution is strictly prohibited
+        self.auto_download = auto_download
+        self.cache_dir = cache_dir
 
-        self._model = TruForNet().to(self.device)
+        self._model: nn.Module = TruForNet().to(self.device)
         self._model.eval()
 
         self._is_loaded = False
+        self._random_init_blocked = False
         self._load_error: Optional[str] = None
 
         self._try_load_model()
@@ -178,50 +168,75 @@ class TruForAdapter(BaseLocalizationModel):
         return self._is_loaded
 
     def _try_load_model(self) -> bool:
-        candidate_paths = []
-        if self.checkpoint_path:
-            candidate_paths.append(self.checkpoint_path)
+        resolved_path, err_notice = resolve_or_download_checkpoint(
+            model_name=self.name,
+            checkpoint_path=self.checkpoint_path,
+            auto_download=self.auto_download,
+            cache_dir=self.cache_dir,
+        )
+        if resolved_path is None:
+            self._load_error = err_notice
+            self._random_init_blocked = True
+            self._is_loaded = False
+            logger.warning(f"[{self.name}] {self._load_error}")
+            return False
 
-        candidate_paths.extend([
-            os.path.expanduser("~/.cache/iml_models/trufor.pth"),
-            "checkpoints/trufor.pth",
-        ])
+        try:
+            logger.info(f"Loading TruFor checkpoint from {resolved_path}")
+            ckpt = torch.load(resolved_path, map_location=self.device, weights_only=False)
+            state_dict = extract_state_dict(ckpt)
 
-        for path in candidate_paths:
-            if path and os.path.exists(path):
-                try:
-                    logger.info(f"Loading TruFor checkpoint from {path}")
-                    ckpt = torch.load(path, map_location=self.device)
-                    if isinstance(ckpt, dict) and "state_dict" in ckpt:
-                        state_dict = ckpt["state_dict"]
-                    elif isinstance(ckpt, dict) and "model" in ckpt:
-                        state_dict = ckpt["model"]
-                    else:
-                        state_dict = ckpt
-
-                    self._model.load_state_dict(state_dict, strict=False)
+            # Check if official TruFor (detconfcmx mit_b2 + DnCNN) keys are present
+            if any(k.startswith(("backbone.patch_embed", "dncnn.", "decode_head.linear_c4")) for k in state_dict):
+                official_net = OfficialTruForNet()
+                ok, val_err = validate_and_load_state_dict(official_net, state_dict, self.name)
+                if ok:
+                    self._model = official_net.to(self.device)
+                    self._model.eval()
+                    self.checkpoint_path = resolved_path
                     self._is_loaded = True
-                    self.checkpoint_path = path
+                    self._random_init_blocked = False
+                    self._load_error = None
                     return True
-                except Exception as e:
-                    self._load_error = str(e)
-                    logger.warning(f"Failed to load TruFor model from {path}: {e}")
 
-        if not self.require_checkpoint:
+            ok, val_err = validate_and_load_state_dict(self._model, state_dict, self.name)
+            if not ok:
+                self._load_error = val_err
+                self._random_init_blocked = True
+                self._is_loaded = False
+                logger.warning(f"[{self.name}] {self._load_error}")
+                return False
+
+            self._model.to(self.device)
+            self._model.eval()
+            self.checkpoint_path = resolved_path
             self._is_loaded = True
+            self._random_init_blocked = False
+            self._load_error = None
             return True
-
-        self._is_loaded = False
-        return False
+        except Exception as e:
+            self._load_error = (
+                f"Quitting with notice: Failed to load TruFor checkpoint from '{resolved_path}': {e}. "
+                f"Running with randomly initialized weights is prohibited."
+            )
+            self._random_init_blocked = True
+            self._is_loaded = False
+            logger.warning(f"[{self.name}] {self._load_error}")
+            return False
 
     def get_model_info(self) -> Dict[str, Any]:
+        online_info = get_online_checkpoint_info(self.name)
         return {
             "name": self.name,
             "family": "deep_cross_modal_transformer",
             "available": self.is_available(),
             "checkpoint_path": self.checkpoint_path,
             "device": str(self.device),
+            "random_init_blocked": self._random_init_blocked,
+            "status_notice": self._load_error,
             "load_error": self._load_error,
+            "online_checkpoint_available": online_info.get("online_available", False),
+            "online_checkpoint_source": online_info.get("primary_source_desc"),
             "parameters": {
                 "threshold": self.threshold,
                 "streams": ["rgb", "noiseprint++"],
@@ -234,12 +249,10 @@ class TruForAdapter(BaseLocalizationModel):
     def predict(self, image: Image.Image) -> ModelOutput:
         if not self.is_available():
             raise RuntimeError(
-                f"TruFor model is not available. Checkpoint path: {self.checkpoint_path}. "
-                f"Error: {self._load_error}"
+                f"TruFor model is not available. {self._load_error}"
             )
 
         start_t = time.perf_counter()
-        w, h = image.size
 
         img_arr = np.array(image.convert("RGB"), dtype=np.float32) / 255.0
         img_t = torch.from_numpy(img_arr).permute(2, 0, 1).unsqueeze(0).to(self.device)
