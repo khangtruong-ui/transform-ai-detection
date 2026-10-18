@@ -1,10 +1,16 @@
 {
-  "total_evaluations": 5670,
+  "total_evaluations": 17010,
   "unique_samples": 90,
   "models_evaluated": [
+    "code",
     "dct_inconsistency_detector",
     "ela_detector",
-    "noise_residual_detector"
+    "iml_vit",
+    "maskclip",
+    "noise_residual_detector",
+    "pscc_net",
+    "sparsevit",
+    "trufor"
   ],
   "oom_models_skipped": [],
   "transformations_evaluated": [
@@ -16,10 +22,10 @@
     "jpeg_compression",
     "sharpening"
   ],
-  "overall_failure_rate": 0.9615520282186949,
+  "overall_failure_rate": 0.8234567901234567,
   "failure_analysis_summary": {
-    "all_models_failed_rate": 0.9121693121693122,
-    "model_specific_failure_count": 42
+    "all_models_failed_rate": 0.2582010582010582,
+    "model_specific_failure_count": 0
   },
   "artifacts_generated": [
     "aggregate_metrics.csv",

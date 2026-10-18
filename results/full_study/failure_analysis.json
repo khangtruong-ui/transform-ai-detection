@@ -1,52 +1,232 @@
 {
   "models": [
+    "code",
     "dct_inconsistency_detector",
     "ela_detector",
-    "noise_residual_detector"
+    "iml_vit",
+    "maskclip",
+    "noise_residual_detector",
+    "pscc_net",
+    "sparsevit",
+    "trufor"
   ],
   "n_samples_complete": 1890,
-  "all_models_failed_count": 1724,
-  "all_models_failed_rate": 0.9121693121693122,
-  "no_models_failed_count": 5,
-  "no_models_failed_rate": 0.0026455026455026454,
-  "model_specific_failure_count": 42,
+  "all_models_failed_count": 488,
+  "all_models_failed_rate": 0.2582010582010582,
+  "no_models_failed_count": 0,
+  "no_models_failed_rate": 0.0,
+  "model_specific_failure_count": 0,
   "model_specific_breakdown": {
-    "dct_inconsistency_detector": 11,
-    "ela_detector": 2,
-    "noise_residual_detector": 29
+    "code": 0,
+    "dct_inconsistency_detector": 0,
+    "ela_detector": 0,
+    "iml_vit": 0,
+    "maskclip": 0,
+    "noise_residual_detector": 0,
+    "pscc_net": 0,
+    "sparsevit": 0,
+    "trufor": 0
   },
   "pairwise_jaccard_similarity": {
+    "code": {
+      "code": 1.0,
+      "dct_inconsistency_detector": 0.8512793176972282,
+      "ela_detector": 0.8423015450186467,
+      "iml_vit": 0.7516891891891891,
+      "maskclip": 0.4653822998193859,
+      "noise_residual_detector": 0.7977766013763896,
+      "pscc_net": 0.7051926298157454,
+      "sparsevit": 0.7279735682819384,
+      "trufor": 0.7973997833152763
+    },
     "dct_inconsistency_detector": {
+      "code": 0.8512793176972282,
       "dct_inconsistency_detector": 1.0,
       "ela_detector": 0.9832974137931034,
-      "noise_residual_detector": 0.9219330855018587
+      "iml_vit": 0.7705788635156665,
+      "maskclip": 0.4073093220338983,
+      "noise_residual_detector": 0.9219330855018587,
+      "pscc_net": 0.7356991525423728,
+      "sparsevit": 0.7925333333333333,
+      "trufor": 0.8815090329436769
     },
     "ela_detector": {
+      "code": 0.8423015450186467,
       "dct_inconsistency_detector": 0.9832974137931034,
       "ela_detector": 1.0,
-      "noise_residual_detector": 0.9231590181430096
+      "iml_vit": 0.7607427055702918,
+      "maskclip": 0.399364406779661,
+      "noise_residual_detector": 0.9231590181430096,
+      "pscc_net": 0.7286698463169051,
+      "sparsevit": 0.7854855923159018,
+      "trufor": 0.873538788522848
+    },
+    "iml_vit": {
+      "code": 0.7516891891891891,
+      "dct_inconsistency_detector": 0.7705788635156665,
+      "ela_detector": 0.7607427055702918,
+      "iml_vit": 1.0,
+      "maskclip": 0.4844760672703752,
+      "noise_residual_detector": 0.7260201377848436,
+      "pscc_net": 0.6600227790432802,
+      "sparsevit": 0.6587389380530974,
+      "trufor": 0.7612188365650969
+    },
+    "maskclip": {
+      "code": 0.4653822998193859,
+      "dct_inconsistency_detector": 0.4073093220338983,
+      "ela_detector": 0.399364406779661,
+      "iml_vit": 0.4844760672703752,
+      "maskclip": 1.0,
+      "noise_residual_detector": 0.3738019169329074,
+      "pscc_net": 0.4772277227722772,
+      "sparsevit": 0.49903163331181405,
+      "trufor": 0.39154616240266965
     },
     "noise_residual_detector": {
+      "code": 0.7977766013763896,
       "dct_inconsistency_detector": 0.9219330855018587,
       "ela_detector": 0.9231590181430096,
-      "noise_residual_detector": 1.0
+      "iml_vit": 0.7260201377848436,
+      "maskclip": 0.3738019169329074,
+      "noise_residual_detector": 1.0,
+      "pscc_net": 0.7094017094017094,
+      "sparsevit": 0.7505330490405118,
+      "trufor": 0.8435337945715806
+    },
+    "pscc_net": {
+      "code": 0.7051926298157454,
+      "dct_inconsistency_detector": 0.7356991525423728,
+      "ela_detector": 0.7286698463169051,
+      "iml_vit": 0.6600227790432802,
+      "maskclip": 0.4772277227722772,
+      "noise_residual_detector": 0.7094017094017094,
+      "pscc_net": 1.0,
+      "sparsevit": 0.7084785133565621,
+      "trufor": 0.6775926921010209
+    },
+    "sparsevit": {
+      "code": 0.7279735682819384,
+      "dct_inconsistency_detector": 0.7925333333333333,
+      "ela_detector": 0.7854855923159018,
+      "iml_vit": 0.6587389380530974,
+      "maskclip": 0.49903163331181405,
+      "noise_residual_detector": 0.7505330490405118,
+      "pscc_net": 0.7084785133565621,
+      "sparsevit": 1.0,
+      "trufor": 0.7236559139784946
+    },
+    "trufor": {
+      "code": 0.7973997833152763,
+      "dct_inconsistency_detector": 0.8815090329436769,
+      "ela_detector": 0.873538788522848,
+      "iml_vit": 0.7612188365650969,
+      "maskclip": 0.39154616240266965,
+      "noise_residual_detector": 0.8435337945715806,
+      "pscc_net": 0.6775926921010209,
+      "sparsevit": 0.7236559139784946,
+      "trufor": 1.0
     }
   },
   "pairwise_correlation": {
+    "code": {
+      "code": 0.9999999999999999,
+      "dct_inconsistency_detector": 0.08385267208727613,
+      "ela_detector": 0.04462233972929185,
+      "iml_vit": 0.213196256813019,
+      "maskclip": 0.23847406877832558,
+      "noise_residual_detector": -0.09840543234587529,
+      "pscc_net": 0.12193532058199603,
+      "sparsevit": 0.08061788053680506,
+      "trufor": 0.08168072738556724
+    },
     "dct_inconsistency_detector": {
+      "code": 0.08385267208727613,
       "dct_inconsistency_detector": 1.0,
       "ela_detector": 0.6870015996306255,
-      "noise_residual_detector": 0.06436458476307656
+      "iml_vit": -0.017316638115984516,
+      "maskclip": -0.15975711474393392,
+      "noise_residual_detector": 0.06436458476307656,
+      "pscc_net": -0.06890980076756328,
+      "sparsevit": 0.059483948194441874,
+      "trufor": 0.042550010738550414
     },
     "ela_detector": {
+      "code": 0.044622339729291846,
       "dct_inconsistency_detector": 0.6870015996306255,
       "ela_detector": 1.0,
-      "noise_residual_detector": 0.15807785937273447
+      "iml_vit": -0.054214699729049264,
+      "maskclip": -0.19133745362857962,
+      "noise_residual_detector": 0.15807785937273447,
+      "pscc_net": -0.07854698757588391,
+      "sparsevit": 0.03584667549746587,
+      "trufor": 0.020843995865531238
+    },
+    "iml_vit": {
+      "code": 0.21319625681301907,
+      "dct_inconsistency_detector": -0.017316638115984516,
+      "ela_detector": -0.05421469972904926,
+      "iml_vit": 1.0,
+      "maskclip": 0.29456454905280854,
+      "noise_residual_detector": -0.11921872158292592,
+      "pscc_net": 0.10656432492563947,
+      "sparsevit": 0.00456610850448754,
+      "trufor": 0.18115721490356956
+    },
+    "maskclip": {
+      "code": 0.23847406877832558,
+      "dct_inconsistency_detector": -0.15975711474393392,
+      "ela_detector": -0.1913374536285796,
+      "iml_vit": 0.29456454905280854,
+      "maskclip": 0.9999999999999999,
+      "noise_residual_detector": -0.24681297214217987,
+      "pscc_net": 0.2772111071970066,
+      "sparsevit": 0.33549415994122744,
+      "trufor": -0.07235566093764166
     },
     "noise_residual_detector": {
+      "code": -0.0984054323458753,
       "dct_inconsistency_detector": 0.06436458476307655,
       "ela_detector": 0.15807785937273447,
-      "noise_residual_detector": 1.0
+      "iml_vit": -0.11921872158292592,
+      "maskclip": -0.24681297214217987,
+      "noise_residual_detector": 1.0,
+      "pscc_net": -0.05592777427130617,
+      "sparsevit": -0.0530781436782519,
+      "trufor": -0.010006746467148615
+    },
+    "pscc_net": {
+      "code": 0.12193532058199603,
+      "dct_inconsistency_detector": -0.06890980076756328,
+      "ela_detector": -0.07854698757588391,
+      "iml_vit": 0.10656432492563947,
+      "maskclip": 0.2772111071970066,
+      "noise_residual_detector": -0.05592777427130617,
+      "pscc_net": 1.0,
+      "sparsevit": 0.23446043027860292,
+      "trufor": -0.07681725243944064
+    },
+    "sparsevit": {
+      "code": 0.08061788053680506,
+      "dct_inconsistency_detector": 0.05948394819444188,
+      "ela_detector": 0.035846675497465876,
+      "iml_vit": 0.00456610850448754,
+      "maskclip": 0.33549415994122744,
+      "noise_residual_detector": -0.05307814367825191,
+      "pscc_net": 0.23446043027860292,
+      "sparsevit": 1.0,
+      "trufor": -0.04028054255282127
+    },
+    "trufor": {
+      "code": 0.08168072738556723,
+      "dct_inconsistency_detector": 0.04255001073855041,
+      "ela_detector": 0.020843995865531238,
+      "iml_vit": 0.18115721490356956,
+      "maskclip": -0.07235566093764167,
+      "noise_residual_detector": -0.010006746467148615,
+      "pscc_net": -0.07681725243944065,
+      "sparsevit": -0.04028054255282127,
+      "trufor": 0.9999999999999998
     }
   }
 }

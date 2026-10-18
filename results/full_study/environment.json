@@ -1,20 +1,20 @@
 {
-  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.39",
-  "python_version": "3.12.14",
+  "platform": "Linux-5.15.0-186-generic-x86_64-with-glibc2.39",
+  "python_version": "3.12.15",
   "cpu": {
     "processor": "x86_64",
-    "cpu_count_logical": 80,
-    "cpu_count_physical": 40
+    "cpu_count_logical": 16,
+    "cpu_count_physical": 8
   },
   "memory": {
-    "total_bytes": 202672250880,
-    "total_gb": 188.75,
-    "available_bytes": 159718948864,
-    "available_gb": 148.75
+    "total_bytes": 67238121472,
+    "total_gb": 62.62,
+    "available_bytes": 57707212800,
+    "available_gb": 53.74
   },
   "disk": {
-    "total_gb": 48.0,
-    "free_gb": 47.22
+    "total_gb": 32.0,
+    "free_gb": 26.2
   },
   "pytorch": {
     "version": "2.11.0+cu128",
